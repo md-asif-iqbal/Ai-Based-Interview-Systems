@@ -128,9 +128,13 @@ export default function SignupPage() {
         window.location.href = "/dashboard";
       }
     } catch (error: unknown) {
-      const err = error as { code?: string };
+      const err = error as { code?: string; message?: string };
       if (err.code === "auth/popup-closed-by-user") return;
-      toast.error("Google sign-up failed. Please try again.");
+      if (err.code === "auth/unauthorized-domain") {
+        toast.error("Firebase Authorized Domain Error: Add this domain in Firebase Console -> Authentication -> Settings -> Authorized domains");
+        return;
+      }
+      toast.error(err.message || "Google sign-up failed. Please try again.");
     } finally {
       setGoogleLoading(false);
     }
