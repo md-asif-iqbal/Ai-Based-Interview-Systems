@@ -131,7 +131,8 @@ export default function SignupPage() {
       const err = error as { code?: string; message?: string };
       if (err.code === "auth/popup-closed-by-user") return;
       if (err.code === "auth/unauthorized-domain") {
-        toast.error("Firebase Authorized Domain Error: Add this domain in Firebase Console -> Authentication -> Settings -> Authorized domains");
+        const currentDomain = typeof window !== "undefined" ? window.location.hostname : "this domain";
+        toast.error(`Unauthorized domain (${currentDomain}). Add "${currentDomain}" to Firebase Console -> Authentication -> Settings -> Authorized domains`, { duration: 8000 });
         return;
       }
       toast.error(err.message || "Google sign-up failed. Please try again.");
