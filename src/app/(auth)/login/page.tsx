@@ -102,6 +102,10 @@ export default function LoginPage() {
         toast.error(`Unauthorized domain (${currentDomain}). Add "${currentDomain}" to Firebase Console -> Authentication -> Settings -> Authorized domains`, { duration: 8000 });
         return;
       }
+      if (err.code === "auth/operation-not-allowed") {
+        toast.error("Google sign-in is disabled. Please enable Google provider in Firebase Console -> Authentication -> Sign-in method.", { duration: 8000 });
+        return;
+      }
       toast.error(err.message || "Google sign-in failed. Please try again.");
     } finally {
       setGoogleLoading(false);
