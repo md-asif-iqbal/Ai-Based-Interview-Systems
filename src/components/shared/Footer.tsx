@@ -82,10 +82,10 @@ export default function Footer() {
 
         <div className="border-t border-[#cbd5e1] dark:border-[#22396F] py-6 flex flex-col sm:flex-row items-center justify-between gap-2">
           <p className="text-xs text-[#475569] dark:text-[#cbd5e1]">
-            © 2026 InterviewIQ. All rights reserved.
+            © 2026 InterviewIQ. Developed by <span className="font-semibold text-[#010736] dark:text-[#FCF1D0]">Asif Iqbal</span>. All rights reserved.
           </p>
           <p className="text-xs text-[#475569] dark:text-[#cbd5e1]">
-            Engineered with Next.js, MongoDB Atlas & Google Gemini AI
+            Engineered by <span className="font-semibold text-[#010736] dark:text-[#FCF1D0]">Asif Iqbal</span> with Next.js, MongoDB Atlas & Google Gemini AI
           </p>
         </div>
       </div>

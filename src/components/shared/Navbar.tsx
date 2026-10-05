@@ -64,18 +64,19 @@ export default function Navbar() {
     ...(user
       ? user.role === "candidate"
         ? [
-            { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
             { href: "/applications", label: "My Applications", icon: FileText },
             { href: "/interviews", label: "My Interviews", icon: Video },
+            { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
           ]
         : [
-            { href: "/recruiter/dashboard", label: "Dashboard", icon: LayoutDashboard },
             { href: "/recruiter/jobs", label: "Manage Jobs", icon: Briefcase },
             { href: "/recruiter/company", label: "Company", icon: Building2 },
+            { href: "/recruiter/dashboard", label: "Dashboard", icon: LayoutDashboard },
           ]
       : [
           { href: "/#how-it-works", label: "How It Works", icon: Layers },
           { href: "/#features", label: "Features", icon: CheckCircle2 },
+          { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
         ]),
   ];
 
@@ -105,22 +106,27 @@ export default function Navbar() {
           </span>
         </Link>
 
-        {/* Desktop Nav */}
+        {/* Desktop Nav (Middle) */}
         <div className="hidden md:flex items-center gap-1.5">
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                pathname === link.href
-                  ? "bg-[#010736] dark:bg-[#22396F] text-[#FCF1D0]"
-                  : "text-[#334155] dark:text-[#cbd5e1] hover:text-[#010736] dark:hover:text-[#FCF1D0] hover:bg-[#f1f5f9] dark:hover:bg-[#0D1C42]"
-              }`}
-            >
-              <link.icon className="h-4 w-4" />
-              {link.label}
-            </Link>
-          ))}
+          {navLinks.map((link) => {
+            const isDashboard = link.label === "Dashboard";
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  pathname === link.href
+                    ? "bg-[#010736] dark:bg-[#22396F] text-[#FCF1D0] shadow-sm"
+                    : isDashboard
+                    ? "border border-[#cbd5e1] dark:border-[#22396F] text-[#010736] dark:text-[#FCF1D0] hover:bg-[#f1f5f9] dark:hover:bg-[#0D1C42] font-semibold"
+                    : "text-[#334155] dark:text-[#cbd5e1] hover:text-[#010736] dark:hover:text-[#FCF1D0] hover:bg-[#f1f5f9] dark:hover:bg-[#0D1C42]"
+                }`}
+              >
+                <link.icon className="h-4 w-4" />
+                {link.label}
+              </Link>
+            );
+          })}
         </div>
 
         {/* Auth Buttons / User Menu */}
