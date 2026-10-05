@@ -18,6 +18,9 @@ import {
   ChevronRight,
   Camera,
   SkipForward,
+  Code2,
+  Target,
+  FileText,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -161,7 +164,7 @@ export default function InterviewPage() {
   useEffect(() => {
     if (phase !== "prep" && phase !== "intro" && phase !== "question") return;
     if (prevFullscreenRef.current && !fullscreen.isFullScreen) {
-      toast.warning("⚠️ Fullscreen exited! Please stay in fullscreen mode during the interview.", {
+      toast.warning("Fullscreen exited! Please stay in fullscreen mode during the interview.", {
         duration: 4000,
       });
     }
@@ -430,7 +433,7 @@ export default function InterviewPage() {
     if (faceDetection.noFaceFrames >= 3) {
       setFaceWarning(true);
       if (faceDetection.noFaceFrames === 3) {
-        toast.warning("⚠️ Face not detected! Please sit in front of the camera and look straight.", {
+        toast.warning("Face not detected! Please sit in front of the camera and look straight.", {
           duration: 4000,
           id: "face-warning",
         });
@@ -486,7 +489,7 @@ export default function InterviewPage() {
           timeSpent,
         });
 
-        toast.success(`✅ Answer saved! ${json.data?.progress?.answered}/${json.data?.progress?.total}`);
+        toast.success(`Answer saved! ${json.data?.progress?.answered}/${json.data?.progress?.total}`);
         speech.resetTranscript();
         moveToNextOrComplete();
       } else {
@@ -592,7 +595,7 @@ export default function InterviewPage() {
   const handleStart = async () => {
     // ═══ STEP 1: Get camera & mic — REQUIRED (must have both) ═══
     if (!video.hasPermission) {
-      toast.info("📷 Requesting camera & microphone access...", { duration: 3000 });
+      toast.info("Requesting camera & microphone access...", { duration: 3000 });
       try {
         await video.startCamera();
       } catch {
@@ -605,7 +608,7 @@ export default function InterviewPage() {
           await video.startCamera();
         } catch {
           // BLOCK — both camera and mic are mandatory
-          toast.error("❌ Camera & Microphone are required for this interview. Please allow access and try again.", {
+          toast.error("Camera & Microphone are required for this interview. Please allow access and try again.", {
             duration: 8000,
           });
           return;
@@ -615,7 +618,7 @@ export default function InterviewPage() {
 
     // Verify mic is available via speech recognition
     if (!speech.isSupported) {
-      toast.error("❌ Microphone / Speech Recognition is not supported in your browser. Please use Chrome.", {
+      toast.error("Microphone / Speech Recognition is not supported in your browser. Please use Chrome.", {
         duration: 8000,
       });
       return;
@@ -678,10 +681,10 @@ export default function InterviewPage() {
   /* ═══════════════════════════════════════ */
   const currentQ = store.questions[store.currentQuestionIndex];
   const isLowTime = store.timeRemaining < 30;
-  const categoryIcon: Record<string, string> = {
-    technical: "💻",
-    behavioral: "🧠",
-    situational: "🎯",
+  const categoryIcon: Record<string, any> = {
+    technical: Code2,
+    behavioral: Brain,
+    situational: Target,
   };
   const getScoreLabel = (score: number) => {
     if (score >= 75) return { label: "Correct", color: "text-green-500", bg: "bg-green-500/10" };
@@ -708,7 +711,7 @@ export default function InterviewPage() {
   // ─── COMPLETED / TERMINATED / EVALUATING ───
   if (phase === "evaluating") {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-background via-background to-primary/5">
+      <div className="min-h-screen flex items-center justify-center p-4 bg-[#010736]">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -717,9 +720,9 @@ export default function InterviewPage() {
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-            className="h-20 w-20 mx-auto rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-2xl shadow-primary/30"
+            className="h-20 w-20 mx-auto rounded-2xl bg-[#0D1C42] border border-[#22396F] flex items-center justify-center shadow-lg"
           >
-            <Brain className="h-10 w-10 text-white" />
+            <Brain className="h-10 w-10 text-[#FCF1D0]" />
           </motion.div>
           <div>
             <h2 className="text-2xl font-bold mb-2">AI is Evaluating...</h2>
@@ -745,7 +748,7 @@ export default function InterviewPage() {
 
   if (phase === "completed" || phase === "terminated") {
     return (
-      <div className="min-h-screen bg-linear-to-br from-background via-background to-primary/5">
+      <div className="min-h-screen bg-white dark:bg-[#010736] text-[#010736] dark:text-white transition-colors duration-200">
         {phase === "terminated" ? (
           /* ─── TERMINATED ─── */
           <div className="min-h-screen flex items-center justify-center p-6">
@@ -918,7 +921,7 @@ export default function InterviewPage() {
               <Button
                 onClick={() => router.push("/dashboard")}
                 size="lg"
-                className="bg-linear-to-r from-primary to-blue-600 hover:opacity-90 shadow-lg shadow-primary/20 px-10"
+                className="bg-[#FCF1D0] text-[#010736] hover:bg-[#f5e6b8] font-bold px-10 transition-colors"
               >
                 Return to Dashboard
               </Button>
@@ -932,24 +935,24 @@ export default function InterviewPage() {
   // ─── READY SCREEN with DEMO TUTORIAL ───
   if (phase === "ready") {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-linear-to-br from-background via-background to-primary/5">
+      <div className="min-h-screen flex items-center justify-center p-4 bg-[#010736]">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
           className="w-full max-w-3xl"
         >
-          <Card className="shadow-2xl border-primary/10 overflow-hidden">
+          <Card className="shadow-2xl border-[#22396F] bg-[#0D1C42] overflow-hidden">
             <CardContent className="p-0">
               {/* Hero Header */}
-              <div className="relative bg-linear-to-r from-primary/10 via-blue-500/10 to-purple-500/10 p-8 pb-6">
+              <div className="relative bg-[#0D1C42] border-b border-[#22396F] p-8 pb-6">
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-                  className="h-20 w-20 mx-auto rounded-2xl bg-linear-to-br from-primary to-blue-600 flex items-center justify-center mb-4 shadow-lg shadow-primary/30"
+                  className="h-20 w-20 mx-auto rounded-2xl bg-[#010736] border border-[#22396F] flex items-center justify-center mb-4"
                 >
-                  <Brain className="h-10 w-10 text-white" />
+                  <Brain className="h-10 w-10 text-[#FCF1D0]" />
                 </motion.div>
                 <motion.h1
                   initial={{ opacity: 0 }}
@@ -984,7 +987,6 @@ export default function InterviewPage() {
                         icon: Volume2,
                         title: "AI Asks Question",
                         desc: "The AI interviewer reads each question aloud via voice",
-                        color: "from-blue-500 to-blue-600",
                         delay: 0.5,
                       },
                       {
@@ -992,7 +994,6 @@ export default function InterviewPage() {
                         icon: Mic,
                         title: "You Speak Answer",
                         desc: "Your microphone captures and converts speech to text live",
-                        color: "from-purple-500 to-purple-600",
                         delay: 0.6,
                       },
                       {
@@ -1000,7 +1001,6 @@ export default function InterviewPage() {
                         icon: CheckCircle2,
                         title: "AI Evaluates",
                         desc: "All answers are batch-evaluated after the interview for fast results",
-                        color: "from-green-500 to-green-600",
                         delay: 0.7,
                       },
                     ].map((item) => (
@@ -1012,10 +1012,10 @@ export default function InterviewPage() {
                         className="relative group"
                       >
                         <div className="rounded-xl border border-border/60 p-4 hover:border-primary/30 hover:shadow-md transition-all duration-300 bg-card h-full">
-                          <div className={`h-10 w-10 rounded-lg bg-linear-to-br ${item.color} flex items-center justify-center mb-3 shadow-sm group-hover:scale-110 transition-transform duration-300`}>
-                            <item.icon className="h-5 w-5 text-white" />
+                          <div className="h-10 w-10 rounded-lg bg-[#22396F] text-[#FCF1D0] flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+                            <item.icon className="h-5 w-5 text-[#FCF1D0]" />
                           </div>
-                          <div className="absolute -top-2 -left-2 h-6 w-6 rounded-full bg-linear-to-br from-primary to-blue-600 text-white text-xs font-bold flex items-center justify-center shadow">
+                          <div className="absolute -top-2 -left-2 h-6 w-6 rounded-full bg-[#FCF1D0] text-[#010736] text-xs font-bold flex items-center justify-center shadow">
                             {item.step}
                           </div>
                           <h4 className="text-sm font-semibold mb-1">{item.title}</h4>
@@ -1055,7 +1055,7 @@ export default function InterviewPage() {
                 >
                   <Button
                     onClick={handleStart}
-                    className="w-full h-12 bg-linear-to-r from-primary to-blue-600 hover:opacity-90 shadow-lg shadow-primary/20 text-base font-semibold group"
+                    className="w-full h-12 bg-[#FCF1D0] text-[#010736] hover:bg-[#f5e6b8] text-base font-bold group transition-colors"
                   >
                     <Video className="h-5 w-5 mr-2 group-hover:scale-110 transition-transform" /> Start Interview
                     <ChevronRight className="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform" />
@@ -1129,15 +1129,15 @@ export default function InterviewPage() {
                   key={prepTime}
                   initial={{ scale: 1.3, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
-                  className="text-7xl font-bold bg-linear-to-r from-primary to-blue-600 bg-clip-text text-transparent"
+                  className="text-7xl font-black text-[#FCF1D0]"
                 >
                   {prepTime}
                 </motion.div>
                 <div className="text-left bg-muted/30 rounded-xl p-5 text-sm space-y-2.5 border border-border/40">
-                  <p className="flex items-center gap-2">✅ <span>Ensure quiet environment</span></p>
-                  <p className="flex items-center gap-2">✅ <span>Camera & mic are on</span></p>
-                  <p className="flex items-center gap-2">✅ <span>~1 min per question</span></p>
-                  <p className="flex items-center gap-2">✅ <span>Speak clearly — AI converts voice to text</span></p>
+                  <p className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" /> <span>Ensure quiet environment</span></p>
+                  <p className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" /> <span>Camera & mic are on</span></p>
+                  <p className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" /> <span>~1 min per question</span></p>
+                  <p className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" /> <span>Speak clearly — AI converts voice to text</span></p>
                 </div>
                 <Button
                   variant="outline"
@@ -1199,9 +1199,9 @@ export default function InterviewPage() {
               <motion.div
                 animate={{ scale: [1, 1.15, 1] }}
                 transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                className="h-24 w-24 mx-auto rounded-full bg-linear-to-br from-primary/20 to-blue-500/20 flex items-center justify-center"
+                className="h-24 w-24 mx-auto rounded-full bg-[#0D1C42] border border-[#22396F] flex items-center justify-center"
               >
-                <Brain className="h-12 w-12 text-primary" />
+                <Brain className="h-12 w-12 text-[#FCF1D0]" />
               </motion.div>
               <h2 className="text-2xl font-bold">AI Interviewer Speaking...</h2>
               <p className="text-muted-foreground max-w-md mx-auto">
@@ -1262,8 +1262,11 @@ export default function InterviewPage() {
                           <span className="h-8 w-8 rounded-lg bg-primary/10 text-primary font-bold text-sm flex items-center justify-center">
                             {store.currentQuestionIndex + 1}
                           </span>
-                          <Badge variant="outline" className="capitalize text-xs">
-                            {categoryIcon[currentQ.category || ""] || "📝"}{" "}
+                          <Badge variant="outline" className="capitalize text-xs flex items-center gap-1.5">
+                            {(() => {
+                              const CatIcon = categoryIcon[currentQ.category || ""] || FileText;
+                              return <CatIcon className="h-3.5 w-3.5" />;
+                            })()}
                             {currentQ.category || currentQ.type || "general"}
                           </Badge>
                           {currentQ.difficulty && (
@@ -1398,7 +1401,7 @@ export default function InterviewPage() {
                     <Button
                       onClick={handleManualSubmit}
                       disabled={submitting || !speech.transcript.trim()}
-                      className="bg-linear-to-r from-primary to-blue-600 hover:opacity-90"
+                      className="bg-[#FCF1D0] text-[#010736] hover:bg-[#f5e6b8] font-bold transition-colors"
                     >
                       {submitting ? (
                         <>

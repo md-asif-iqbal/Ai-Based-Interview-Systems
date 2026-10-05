@@ -2,6 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
+import { Award, CheckCircle2, HelpCircle, XCircle } from "lucide-react";
 
 interface ScoreReactionProps {
   score: number;
@@ -75,14 +76,14 @@ function AnimatedScoreCircle({ score }: { score: number }) {
     return () => clearInterval(timer);
   }, [score]);
 
-  const getGradient = () => {
-    if (score >= 85) return { from: "#10b981", to: "#059669", shadow: "rgba(16, 185, 129, 0.4)" };
-    if (score >= 70) return { from: "#3b82f6", to: "#2563eb", shadow: "rgba(59, 130, 246, 0.4)" };
-    if (score >= 50) return { from: "#f59e0b", to: "#d97706", shadow: "rgba(245, 158, 11, 0.4)" };
-    return { from: "#ef4444", to: "#dc2626", shadow: "rgba(239, 68, 68, 0.4)" };
+  const getColor = () => {
+    if (score >= 85) return "#FCF1D0";
+    if (score >= 70) return "#FCF1D0";
+    if (score >= 50) return "#ffffff";
+    return "#ef4444";
   };
 
-  const gradient = getGradient();
+  const ringColor = getColor();
   const circumference = 2 * Math.PI * 54;
 
   return (
@@ -93,15 +94,12 @@ function AnimatedScoreCircle({ score }: { score: number }) {
       transition={{ delay: 0.3, duration: 0.8, type: "spring", stiffness: 150 }}
       style={{ perspective: 1000 }}
     >
-      {/* Glow ring */}
+      {/* Background ring */}
       <motion.div
-        className="absolute inset-0 rounded-full"
-        style={{
-          background: `radial-gradient(circle, ${gradient.shadow} 0%, transparent 70%)`,
-        }}
+        className="absolute inset-0 rounded-full border border-[#22396F] bg-[#010736]/40"
         animate={{
-          scale: [1, 1.15, 1],
-          opacity: [0.5, 0.8, 0.5],
+          scale: [1, 1.04, 1],
+          opacity: [0.6, 0.9, 0.6],
         }}
         transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
       />
@@ -126,7 +124,7 @@ function AnimatedScoreCircle({ score }: { score: number }) {
           <motion.circle
             cx="60" cy="60" r="54"
             fill="none"
-            stroke={`url(#score3dGrad)`}
+            stroke={ringColor}
             strokeWidth="8"
             strokeLinecap="round"
             strokeDasharray={circumference}
@@ -135,20 +133,12 @@ function AnimatedScoreCircle({ score }: { score: number }) {
             transition={{ delay: 0.5, duration: 1.5, ease: "easeOut" }}
             transform="rotate(-90 60 60)"
           />
-          {/* Gradient */}
-          <defs>
-            <linearGradient id="score3dGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor={gradient.from} />
-              <stop offset="100%" stopColor={gradient.to} />
-            </linearGradient>
-          </defs>
         </svg>
 
         {/* Center content */}
         <div className="absolute inset-0 flex flex-col items-center justify-center">
           <motion.span
-            className="text-5xl font-black"
-            style={{ color: gradient.from }}
+            className="text-5xl font-black text-[#FCF1D0]"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.8 }}
@@ -191,8 +181,6 @@ export default function ScoreReaction({ score, recommendation, jobTitle }: Score
         subtitle: "You absolutely nailed it!",
         message:
           "Your responses demonstrate exceptional knowledge and communication. You're a top-tier candidate for this role. The hiring team will be impressed!",
-        bgClass: "from-emerald-500/10 via-green-500/5 to-teal-500/10",
-        borderClass: "border-emerald-500/20",
         showConfetti: true,
       };
     }
@@ -202,8 +190,6 @@ export default function ScoreReaction({ score, recommendation, jobTitle }: Score
         subtitle: "Solid performance overall",
         message:
           "You demonstrated strong skills and knowledge. With a few refinements, you'd be an even stronger candidate. Keep up the excellent work!",
-        bgClass: "from-blue-500/10 via-indigo-500/5 to-violet-500/10",
-        borderClass: "border-blue-500/20",
         showConfetti: false,
       };
     }
@@ -213,8 +199,6 @@ export default function ScoreReaction({ score, recommendation, jobTitle }: Score
         subtitle: "You showed potential",
         message:
           "You have a solid foundation to build on. Focus on strengthening your technical depth and providing more detailed examples. You'll do better next time!",
-        bgClass: "from-yellow-500/10 via-amber-500/5 to-orange-500/10",
-        borderClass: "border-yellow-500/20",
         showConfetti: false,
       };
     }
@@ -223,8 +207,6 @@ export default function ScoreReaction({ score, recommendation, jobTitle }: Score
       subtitle: "Every expert was once a beginner",
       message:
         "Don't be discouraged! This is a learning opportunity. Review the topics covered, practice your answers, and come back stronger. Success is built on persistence.",
-      bgClass: "from-red-500/10 via-rose-500/5 to-pink-500/10",
-      borderClass: "border-red-500/20",
       showConfetti: false,
     };
   };
@@ -232,10 +214,10 @@ export default function ScoreReaction({ score, recommendation, jobTitle }: Score
   const config = getConfig();
 
   const recLabel = {
-    strong_hire: { text: "🌟 Strong Hire — Excellent Fit!", color: "text-green-600", bg: "bg-green-500/10 border-green-500/20" },
-    hire: { text: "✅ Hire — Good Fit", color: "text-emerald-600", bg: "bg-emerald-500/10 border-emerald-500/20" },
-    maybe: { text: "🤔 Maybe — Needs Improvement", color: "text-yellow-600", bg: "bg-yellow-500/10 border-yellow-500/20" },
-    no_hire: { text: "❌ Not a Fit — Keep Practicing", color: "text-red-500", bg: "bg-red-500/10 border-red-500/20" },
+    strong_hire: { text: "Strong Hire — Excellent Fit!", color: "text-green-600", bg: "bg-green-500/10 border-green-500/20", icon: Award },
+    hire: { text: "Hire — Good Fit", color: "text-emerald-600", bg: "bg-emerald-500/10 border-emerald-500/20", icon: CheckCircle2 },
+    maybe: { text: "Maybe — Needs Improvement", color: "text-yellow-600", bg: "bg-yellow-500/10 border-yellow-500/20", icon: HelpCircle },
+    no_hire: { text: "Not a Fit — Keep Practicing", color: "text-red-500", bg: "bg-red-500/10 border-red-500/20", icon: XCircle },
   }[recommendation || ""] || null;
 
   return (
@@ -246,23 +228,19 @@ export default function ScoreReaction({ score, recommendation, jobTitle }: Score
       </AnimatePresence>
 
       {/* Main content */}
-      <div className={`relative bg-linear-to-br ${config.bgClass} rounded-2xl border ${config.borderClass} p-8 overflow-hidden`}>
-        {/* Animated background circles */}
+      <div className="relative bg-[#0D1C42] rounded-2xl border border-[#22396F] p-8 overflow-hidden">
+        {/* Subtle decorative circles */}
         <motion.div
-          className="absolute -top-20 -right-20 w-64 h-64 rounded-full opacity-10"
-          style={{ background: score >= 70 ? "#10b981" : score >= 50 ? "#f59e0b" : "#ef4444" }}
+          className="absolute -top-20 -right-20 w-64 h-64 rounded-full bg-[#22396F]/20 pointer-events-none"
           animate={{
-            scale: [1, 1.2, 1],
-            rotate: [0, 180, 360],
+            scale: [1, 1.1, 1],
           }}
           transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
         />
         <motion.div
-          className="absolute -bottom-10 -left-10 w-40 h-40 rounded-full opacity-10"
-          style={{ background: score >= 70 ? "#3b82f6" : score >= 50 ? "#d97706" : "#dc2626" }}
+          className="absolute -bottom-10 -left-10 w-40 h-40 rounded-full bg-[#010736]/60 pointer-events-none"
           animate={{
-            scale: [1.2, 1, 1.2],
-            rotate: [360, 180, 0],
+            scale: [1.1, 1, 1.1],
           }}
           transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
         />
@@ -302,7 +280,8 @@ export default function ScoreReaction({ score, recommendation, jobTitle }: Score
                     Position Fit: {jobTitle}
                   </p>
                 )}
-                <p className={`text-sm font-bold text-center ${recLabel.color}`}>
+                <p className={`text-sm font-bold text-center flex items-center justify-center gap-1.5 ${recLabel.color}`}>
+                  <recLabel.icon className="h-4 w-4 shrink-0" />
                   {recLabel.text}
                 </p>
               </div>

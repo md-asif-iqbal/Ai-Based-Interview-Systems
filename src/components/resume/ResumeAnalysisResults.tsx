@@ -120,7 +120,7 @@ export default function ResumeAnalysisResults({ data }: ResumeAnalysisResultsPro
       {/* Score Card */}
       <motion.div {...fadeUp}>
         <Card className="border-border/40 overflow-hidden">
-          <div className="bg-linear-to-r from-primary/5 to-accent/5 p-6">
+          <div className="bg-[#0D1C42] border-b border-[#22396F] p-6">
             <div className="flex items-center gap-6">
               <div className="relative">
                 <div className="flex h-20 w-20 items-center justify-center rounded-full border-4 border-primary/20">

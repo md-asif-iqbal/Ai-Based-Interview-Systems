@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Loader2, Upload, FileText, CheckCircle, AlertCircle } from "lucide-react";
+import { Loader2, Upload, FileText, CheckCircle, AlertCircle, FlaskConical, Code2, Cpu } from "lucide-react";
 import { toast } from "sonner";
 
 interface ExperienceEntry {
@@ -89,7 +89,7 @@ export default function TestAIPage() {
       }
 
       setResult(data);
-      toast.success("✅ Resume parsed successfully!");
+      toast.success("Resume parsed successfully!");
     } catch (error) {
       console.error("Upload error:", error);
       toast.error("Something went wrong. Please try again.");
@@ -101,7 +101,10 @@ export default function TestAIPage() {
   return (
     <div className="container mx-auto py-8 px-4 max-w-4xl">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold mb-2">🧪 AI Resume Parser Test</h1>
+        <h1 className="text-3xl font-bold mb-2 flex items-center gap-2.5">
+          <FlaskConical className="h-8 w-8 text-[#22396F] dark:text-[#FCF1D0]" />
+          AI Resume Parser Test
+        </h1>
         <p className="text-muted-foreground">
           Upload a PDF resume and see AI-powered parsing in action
         </p>
@@ -291,8 +294,9 @@ export default function TestAIPage() {
 
             {/* Raw JSON for debugging */}
             <details className="mt-4">
-              <summary className="cursor-pointer text-sm text-muted-foreground hover:text-foreground">
-                📋 View Raw JSON
+              <summary className="cursor-pointer text-sm text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5">
+                <Code2 className="h-4 w-4" />
+                View Raw JSON
               </summary>
               <pre className="mt-2 p-4 bg-muted rounded-lg text-xs overflow-auto">
                 {JSON.stringify(result.data, null, 2)}
@@ -321,7 +325,10 @@ export default function TestAIPage() {
             </ol>
             
             <div className="mt-4 p-4 bg-primary/5 rounded-lg">
-              <p className="font-semibold text-primary mb-2">✨ What AI Extracts:</p>
+              <p className="font-semibold text-primary mb-2 flex items-center gap-1.5">
+                <Cpu className="h-4 w-4" />
+                What AI Extracts:
+              </p>
               <ul className="list-disc list-inside space-y-1 text-xs">
                 <li>Name, email, phone, location</li>
                 <li>Professional summary</li>

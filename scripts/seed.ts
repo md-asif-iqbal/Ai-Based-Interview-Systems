@@ -5,11 +5,13 @@ import { resolve } from "path";
 config({ path: resolve(__dirname, "../.env.local") });
 
 import mongoose from "mongoose";
-import bcrypt from "bcryptjs";
 import User from "../src/models/User";
 import Company from "../src/models/Company";
 import Candidate from "../src/models/Candidate";
 import JobPosting from "../src/models/JobPosting";
+import Application from "../src/models/Application";
+import Interview from "../src/models/Interview";
+import Notification from "../src/models/Notification";
 import connectToDatabase from "../src/lib/db/mongodb";
 
 async function seedDatabase() {
@@ -22,14 +24,16 @@ async function seedDatabase() {
     await Company.deleteMany({});
     await Candidate.deleteMany({});
     await JobPosting.deleteMany({});
+    await Application.deleteMany({});
+    await Interview.deleteMany({});
+    await Notification.deleteMany({});
 
     // Create Users
     console.log("Creating users...");
-    // Use plain password - User model will hash it in pre-save hook
     const plainPassword = "password123";
 
     const recruiter1 = await User.create({
-      fullName: "John Recruiter",
+      fullName: "Alex Rivera",
       email: "recruiter@example.com",
       password: plainPassword,
       role: "recruiter",
@@ -72,32 +76,29 @@ async function seedDatabase() {
     console.log("Creating companies...");
     const company1 = await Company.create({
       name: "TechCorp Solutions",
-      description: "Leading technology solutions provider specializing in enterprise software and cloud services.",
+      description: "Leading enterprise cloud and software architecture provider delivering mission-critical applications.",
       industry: "Technology",
       website: "https://techcorp.example.com",
-      logo: "https://placehold.co/400x400/cyan/white?text=TechCorp",
       size: "201-500",
       location: "San Francisco, CA",
       ownerId: recruiter1._id,
     });
 
     const company2 = await Company.create({
-      name: "Innovate Labs",
-      description: "Cutting-edge AI and machine learning research company building the future of technology.",
+      name: "Innovate AI Labs",
+      description: "Cutting-edge artificial intelligence and LLM intelligence platform.",
       industry: "Artificial Intelligence",
       website: "https://innovatelabs.example.com",
-      logo: "https://placehold.co/400x400/purple/white?text=Innovate",
       size: "51-200",
       location: "New York, NY",
       ownerId: recruiter2._id,
     });
 
     const company3 = await Company.create({
-      name: "CloudScale Inc",
-      description: "Cloud infrastructure and DevOps solutions for modern enterprises.",
+      name: "CloudScale Systems",
+      description: "High-performance DevOps, Kubernetes infrastructure, and observability tooling.",
       industry: "Cloud Computing",
       website: "https://cloudscale.example.com",
-      logo: "https://placehold.co/400x400/teal/white?text=CloudScale",
       size: "11-50",
       location: "Austin, TX",
       ownerId: recruiter1._id,
@@ -105,285 +106,147 @@ async function seedDatabase() {
 
     // Create Job Postings
     console.log("Creating job postings...");
-    await JobPosting.create({
+    const job1 = await JobPosting.create({
       companyId: company1._id,
       recruiterId: recruiter1._id,
       createdBy: recruiter1._id,
       title: "Senior Full Stack Developer",
-      description: `We are seeking an experienced Full Stack Developer to join our growing team. You will be responsible for designing, developing, and maintaining scalable web applications.
+      description: `We are seeking an experienced Senior Full Stack Developer to build robust, scalable applications with React, Next.js, Node.js, and MongoDB.
 
 Key Responsibilities:
-- Design and develop robust, scalable web applications
-- Work with React, Node.js, and MongoDB
-- Collaborate with cross-functional teams
-- Participate in code reviews and mentoring junior developers
-- Implement best practices for testing and deployment
+- Architect and develop high-throughput web systems
+- Build responsive user interfaces with Next.js and Tailwind CSS
+- Integrate MongoDB data layers and REST/GraphQL APIs
+- Collaborate with AI evaluation systems and microservices
+- Mentor engineers and drive code quality
 
 What We Offer:
-- Competitive salary and equity
-- Health, dental, and vision insurance
-- Flexible work schedule and remote options
-- Professional development opportunities`,
+- Competitive compensation and equity package
+- Comprehensive health, dental, and life coverage
+- Remote-first flexible working environment
+- Generous annual learning and conference budget`,
       requirements: [
-        "5+ years of experience in full-stack development",
-        "Strong proficiency in React, Node.js, TypeScript",
-        "Experience with MongoDB or other NoSQL databases",
-        "Knowledge of AWS/Azure cloud platforms",
-        "Excellent problem-solving and communication skills",
+        "5+ years of software engineering experience",
+        "Deep expertise in React, Next.js, and Node.js",
+        "Hands-on experience with MongoDB and schema design",
+        "Familiarity with containerization and cloud deployments",
       ],
-      skills: [
-        "React",
-        "Node.js",
-        "TypeScript",
-        "MongoDB",
-        "AWS",
-        "Docker",
-        "GraphQL",
-        "REST APIs",
-      ],
+      skills: ["React", "Node.js", "TypeScript", "Next.js", "MongoDB", "Docker", "Tailwind CSS"],
       experienceLevel: "senior",
       jobType: "full-time",
       location: "San Francisco, CA",
-      workMode: "hybrid",
-      salaryRange: { min: 120000, max: 180000, currency: "USD" },
-      benefits: [
-        "Health Insurance",
-        "401(k) Matching",
-        "Remote Work",
-        "Unlimited PTO",
-        "Learning Budget",
-      ],
-      applicationDeadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
+      workMode: "remote",
+      salaryRange: { min: 140000, max: 185000, currency: "USD" },
+      benefits: ["Health Insurance", "Remote Work", "401(k) Match", "Unlimited PTO"],
+      applicationDeadline: new Date(Date.now() + 45 * 24 * 60 * 60 * 1000),
       status: "active",
+      applicationCount: 3,
+      interviewCount: 1,
     });
 
-    await JobPosting.create({
+    const job2 = await JobPosting.create({
       companyId: company2._id,
       recruiterId: recruiter2._id,
       createdBy: recruiter2._id,
       title: "Machine Learning Engineer",
-      description: `Join our AI team to build cutting-edge machine learning models and systems. You will work on exciting projects involving NLP, computer vision, and recommendation systems.
+      description: `Join our AI research team developing next-generation multimodal models and intelligent evaluation agents.
 
 Key Responsibilities:
-- Design and implement ML models and pipelines
-- Work with large-scale datasets
-- Deploy models to production environments
-- Collaborate with research team on new algorithms
-- Optimize model performance and scalability
+- Design, train, and deploy machine learning models
+- Build low-latency inference pipelines for NLP and voice evaluation
+- Optimize vector embeddings and retrieval augmented generation
+- Benchmark model performance against human evaluations
 
-What We Offer:
-- Work on state-of-the-art AI projects
-- Access to powerful compute resources
-- Publication opportunities
-- Conference attendance budget`,
+Requirements:
+- MS or PhD in Computer Science, AI, or equivalent practical experience
+- 3+ years experience in Python, PyTorch, and NLP
+- Experience deploying ML models on Kubernetes and cloud infrastructure`,
       requirements: [
-        "MS/PhD in Computer Science, ML, or related field",
-        "3+ years of experience in ML engineering",
-        "Strong Python and TensorFlow/PyTorch skills",
-        "Experience with NLP or Computer Vision",
-        "Knowledge of MLOps and model deployment",
+        "3+ years experience with PyTorch and Python",
+        "Strong understanding of NLP and transformer architectures",
+        "Experience building production inference pipelines",
       ],
-      skills: [
-        "Python",
-        "TensorFlow",
-        "PyTorch",
-        "NLP",
-        "Computer Vision",
-        "Kubernetes",
-        "MLflow",
-        "SQL",
-      ],
+      skills: ["Python", "PyTorch", "NLP", "Machine Learning", "Kubernetes", "FastAPI"],
       experienceLevel: "mid",
       jobType: "full-time",
       location: "New York, NY",
-      workMode: "remote",
-      salaryRange: { min: 140000, max: 200000, currency: "USD" },
-      benefits: [
-        "Health Insurance",
-        "Stock Options",
-        "Remote First",
-        "Learning Budget",
-        "Conference Budget",
-      ],
-      applicationDeadline: new Date(Date.now() + 45 * 24 * 60 * 60 * 1000),
+      workMode: "hybrid",
+      salaryRange: { min: 150000, max: 210000, currency: "USD" },
+      benefits: ["Health Insurance", "Stock Options", "Learning Stipend", "Equipment Budget"],
+      applicationDeadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
       status: "active",
+      applicationCount: 2,
+      interviewCount: 1,
     });
 
-    await JobPosting.create({
+    const job3 = await JobPosting.create({
       companyId: company3._id,
       recruiterId: recruiter1._id,
       createdBy: recruiter1._id,
-      title: "DevOps Engineer",
-      description: `We're looking for a talented DevOps Engineer to help us build and maintain our cloud infrastructure. You'll work with modern tools and technologies to ensure reliable, scalable systems.
-
-Key Responsibilities:
-- Design and manage cloud infrastructure (AWS/GCP)
-- Implement CI/CD pipelines
-- Monitor system performance and reliability
-- Automate deployment processes
-- Collaborate with development teams
-
-What We Offer:
-- Work with latest DevOps tools
-- Flexible work environment
-- Growth opportunities
-- Supportive team culture`,
+      title: "DevOps & Cloud Engineer",
+      description: `Lead our cloud infrastructure automation, CI/CD pipelines, and observability stack across multi-region deployments.`,
       requirements: [
-        "3+ years of DevOps experience",
-        "Strong knowledge of AWS or GCP",
-        "Experience with Kubernetes and Docker",
-        "Proficiency in scripting (Python, Bash)",
-        "Understanding of networking and security",
+        "3+ years managing AWS or GCP cloud environments",
+        "Proficiency in Terraform, Docker, and Kubernetes",
+        "Solid shell scripting and automation skills",
       ],
-      skills: [
-        "AWS",
-        "Kubernetes",
-        "Docker",
-        "Terraform",
-        "Jenkins",
-        "Python",
-        "Bash",
-        "Monitoring",
-      ],
+      skills: ["AWS", "Docker", "Kubernetes", "Terraform", "CI/CD", "Linux"],
       experienceLevel: "mid",
       jobType: "full-time",
       location: "Austin, TX",
-      workMode: "hybrid",
-      salaryRange: { min: 100000, max: 150000, currency: "USD" },
-      benefits: [
-        "Health Insurance",
-        "401(k)",
-        "Flexible Hours",
-        "Remote Options",
-        "Training Budget",
-      ],
+      workMode: "remote",
+      salaryRange: { min: 125000, max: 165000, currency: "USD" },
+      benefits: ["Health Coverage", "Flexible Schedule", "Home Office Setup"],
       applicationDeadline: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000),
       status: "active",
+      applicationCount: 1,
+      interviewCount: 0,
     });
 
-    await JobPosting.create({
+    const job4 = await JobPosting.create({
       companyId: company1._id,
       recruiterId: recruiter1._id,
       createdBy: recruiter1._id,
-      title: "Frontend Developer (React)",
-      description: `Join our frontend team to build beautiful, performant user interfaces. You'll work on our flagship products used by thousands of users daily.
-
-Key Responsibilities:
-- Develop responsive web applications with React
-- Implement pixel-perfect designs
-- Optimize application performance
-- Write clean, maintainable code
-- Collaborate with designers and backend team
-
-What We Offer:
-- Modern tech stack
-- Creative freedom
-- Collaborative environment
-- Career growth opportunities`,
+      title: "Frontend Engineer (React / Next.js)",
+      description: `Create beautiful, ultra-fast web experiences for our AI interview platform using React 19, TypeScript, and Tailwind CSS.`,
       requirements: [
-        "2+ years of React development experience",
-        "Strong JavaScript/TypeScript skills",
-        "Experience with state management (Redux/Zustand)",
-        "Knowledge of CSS and styling frameworks",
-        "Understanding of web performance optimization",
+        "2+ years of dedicated React / Next.js experience",
+        "Strong CSS skills, accessibility best practices, and responsive design",
+        "State management with Zustand and clean component architectures",
       ],
-      skills: [
-        "React",
-        "TypeScript",
-        "CSS",
-        "Tailwind CSS",
-        "Redux",
-        "Next.js",
-        "Jest",
-        "Git",
-      ],
+      skills: ["React", "Next.js", "TypeScript", "Tailwind CSS", "Zustand"],
       experienceLevel: "junior",
       jobType: "full-time",
       location: "San Francisco, CA",
-      workMode: "on-site",
-      salaryRange: { min: 80000, max: 120000, currency: "USD" },
-      benefits: [
-        "Health Insurance",
-        "Snacks & Meals",
-        "Gym Membership",
-        "Learning Budget",
-      ],
-      applicationDeadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-      status: "active",
-    });
-
-    await JobPosting.create({
-      companyId: company2._id,
-      recruiterId: recruiter2._id,
-      createdBy: recruiter2._id,
-      title: "Data Scientist",
-      description: `We're seeking a Data Scientist to extract insights from large datasets and build predictive models that drive business decisions.
-
-Key Responsibilities:
-- Analyze complex datasets
-- Build predictive and statistical models
-- Create data visualizations and reports
-- Work with product team on feature development
-- Communicate findings to stakeholders
-
-What We Offer:
-- Access to interesting datasets
-- Modern data stack
-- Collaborative research environment
-- Impact on product direction`,
-      requirements: [
-        "MS in Statistics, Data Science, or related field",
-        "2+ years of data science experience",
-        "Strong Python and SQL skills",
-        "Experience with statistical modeling",
-        "Excellent communication skills",
-      ],
-      skills: [
-        "Python",
-        "SQL",
-        "Pandas",
-        "Scikit-learn",
-        "Statistics",
-        "Tableau",
-        "R",
-        "Jupyter",
-      ],
-      experienceLevel: "mid",
-      jobType: "full-time",
-      location: "New York, NY",
       workMode: "hybrid",
-      salaryRange: { min: 110000, max: 160000, currency: "USD" },
-      benefits: [
-        "Health Insurance",
-        "Stock Options",
-        "Flexible Schedule",
-        "Conference Budget",
-      ],
-      applicationDeadline: new Date(Date.now() + 45 * 24 * 60 * 60 * 1000),
+      salaryRange: { min: 85000, max: 120000, currency: "USD" },
+      benefits: ["Health Insurance", "Commuter Benefits", "Mentorship Program"],
+      applicationDeadline: new Date(Date.now() + 40 * 24 * 60 * 60 * 1000),
       status: "active",
+      applicationCount: 4,
+      interviewCount: 1,
     });
 
-    // Create Candidate Profiles
+    // Create Candidates
     console.log("Creating candidate profiles...");
-    await Candidate.create({
+    const cand1Profile = await Candidate.create({
       userId: candidate1._id,
-      resumeUrl: "/uploads/resumes/alice-developer-resume.pdf",
-      skills: ["React", "Node.js", "TypeScript", "MongoDB", "AWS"],
+      resumeUrl: "/uploads/resumes/alice-developer.pdf",
+      skills: ["React", "Next.js", "TypeScript", "Node.js", "MongoDB", "Tailwind CSS"],
       experience: [
         {
-          title: "Senior Software Engineer",
-          company: "Tech Startup Inc",
-          startDate: new Date("2021-01-01"),
-          endDate: new Date("2024-01-01"),
-          description: "Led development of core platform features",
-          current: false,
+          title: "Senior Full Stack Engineer",
+          company: "Nexus Digital Systems",
+          startDate: new Date("2021-03-01"),
+          current: true,
+          description: "Built scalable enterprise React and Node.js microservices.",
         },
         {
-          title: "Software Engineer",
-          company: "Digital Agency",
+          title: "Frontend Developer",
+          company: "Webcraft Studio",
           startDate: new Date("2019-01-01"),
-          endDate: new Date("2020-12-31"),
-          description: "Built client web applications",
+          endDate: new Date("2021-02-28"),
+          description: "Developed modern web apps and dynamic user dashboards.",
           current: false,
         },
       ],
@@ -393,52 +256,264 @@ What We Offer:
           field: "Computer Science",
           institution: "University of California, Berkeley",
           startDate: new Date("2015-09-01"),
-          endDate: new Date("2019-05-31"),
-          gpa: 3.7,
+          endDate: new Date("2019-05-30"),
+          gpa: 3.85,
         },
       ],
       certifications: [
         {
-          name: "AWS Solutions Architect",
+          name: "AWS Certified Developer",
           issuer: "Amazon Web Services",
-          issueDate: new Date("2022-06-01"),
+          issueDate: new Date("2022-04-15"),
         },
       ],
     });
 
-    await Candidate.create({
+    const cand2Profile = await Candidate.create({
       userId: candidate2._id,
-      skills: ["Python", "TensorFlow", "Machine Learning", "Data Science"],
+      skills: ["Python", "PyTorch", "NLP", "Machine Learning", "FastAPI"],
       experience: [
         {
-          title: "ML Engineer",
-          company: "AI Solutions Corp",
-          startDate: new Date("2020-03-01"),
+          title: "Machine Learning Researcher",
+          company: "AI Core Labs",
+          startDate: new Date("2020-06-01"),
           current: true,
-          description: "Developing ML models for production",
+          description: "Developing language model fine-tuning pipelines.",
         },
       ],
       education: [
         {
           degree: "Master of Science",
-          field: "Machine Learning",
+          field: "Artificial Intelligence",
           institution: "Stanford University",
           startDate: new Date("2018-09-01"),
-          endDate: new Date("2020-06-30"),
-          gpa: 3.9,
+          endDate: new Date("2020-05-30"),
+          gpa: 3.92,
         },
       ],
     });
 
-    console.log("✅ Database seeded successfully!");
+    // Create Applications
+    console.log("Creating applications...");
+    const app1 = await Application.create({
+      jobId: job1._id,
+      candidateId: cand1Profile._id,
+      status: "interviewed",
+      resumeMatchScore: 92,
+      coverLetter: "I am passionate about building scalable full-stack applications with React and MongoDB.",
+      expectedSalary: 160000,
+      appliedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
+    });
+
+    const app2 = await Application.create({
+      jobId: job4._id,
+      candidateId: cand1Profile._id,
+      status: "interview_scheduled",
+      resumeMatchScore: 89,
+      coverLetter: "Excited about modern UI engineering and AI integration.",
+      expectedSalary: 110000,
+      appliedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+    });
+
+    const app3 = await Application.create({
+      jobId: job2._id,
+      candidateId: cand2Profile._id,
+      status: "interviewed",
+      resumeMatchScore: 95,
+      coverLetter: "Passionate about NLP, model evaluation, and high-performance inference.",
+      expectedSalary: 180000,
+      appliedAt: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000),
+    });
+
+    // Create Interviews
+    console.log("Creating interviews...");
+    // 1. Completed interview for Alice Developer (Senior Full Stack)
+    await Interview.create({
+      applicationId: app1._id,
+      interviewType: "technical",
+      mode: "ai_conducted",
+      scheduledAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
+      startedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
+      completedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000 + 25 * 60 * 1000),
+      durationSeconds: 1500,
+      status: "completed",
+      overallScore: 88,
+      detailedScores: {
+        technical: 90,
+        communication: 86,
+        problemSolving: 88,
+        confidence: 87,
+      },
+      strengths: [
+        "In-depth knowledge of React component lifecycle and server components",
+        "Strong understanding of MongoDB indexing and aggregation queries",
+        "Clear and structured communication style",
+      ],
+      weaknesses: [
+        "Could elaborate more on microservice caching patterns",
+      ],
+      aiRecommendation: "strong_hire",
+      securityScore: 98,
+      totalViolations: 0,
+      faceVisibilityPercentage: 99,
+      integrityVerified: true,
+      questions: [
+        {
+          questionText: "How do React Server Components differ from traditional Client Components in Next.js?",
+          question: "How do React Server Components differ from traditional Client Components in Next.js?",
+          category: "technical",
+          difficulty: "medium",
+          timeLimitSeconds: 60,
+          order: 1,
+        },
+        {
+          questionText: "Explain how MongoDB compound indexes optimize complex query performance.",
+          question: "Explain how MongoDB compound indexes optimize complex query performance.",
+          category: "technical",
+          difficulty: "hard",
+          timeLimitSeconds: 60,
+          order: 2,
+        },
+        {
+          questionText: "Describe a challenging bug you debugged in production and how you resolved it.",
+          question: "Describe a challenging bug you debugged in production and how you resolved it.",
+          category: "behavioral",
+          difficulty: "medium",
+          timeLimitSeconds: 60,
+          order: 3,
+        },
+      ],
+      answers: [
+        {
+          questionIndex: 0,
+          answerText: "React Server Components execute entirely on the server and render HTML with zero client-side JavaScript bundle overhead, whereas client components allow client interactivity and hooks.",
+          score: 92,
+          duration: 48,
+        },
+        {
+          questionIndex: 1,
+          answerText: "Compound indexes follow the Equality, Sort, Range rule to allow MongoDB to satisfy multi-key lookups without scanning entire collections.",
+          score: 88,
+          duration: 52,
+        },
+        {
+          questionIndex: 2,
+          answerText: "Identified a memory leak caused by uncleaned event listeners in a WebSocket connection by analyzing heap snapshots, then encapsulated cleanup in useEffect return functions.",
+          score: 84,
+          duration: 55,
+        },
+      ],
+    });
+
+    // 2. Scheduled/Ready interview for Alice Developer (Frontend Engineer)
+    await Interview.create({
+      applicationId: app2._id,
+      interviewType: "technical",
+      mode: "ai_conducted",
+      scheduledAt: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000),
+      status: "scheduled",
+      overallScore: 0,
+      questions: [
+        {
+          questionText: "What are the core advantages of Tailwind CSS v4's modern CSS engine?",
+          question: "What are the core advantages of Tailwind CSS v4's modern CSS engine?",
+          category: "technical",
+          difficulty: "medium",
+          timeLimitSeconds: 60,
+          order: 1,
+        },
+        {
+          questionText: "How do you manage client-side state efficiently with Zustand in a large Next.js app?",
+          question: "How do you manage client-side state efficiently with Zustand in a large Next.js app?",
+          category: "technical",
+          difficulty: "medium",
+          timeLimitSeconds: 60,
+          order: 2,
+        },
+      ],
+    });
+
+    // 3. Completed interview for Bob Engineer (ML Engineer)
+    await Interview.create({
+      applicationId: app3._id,
+      interviewType: "technical",
+      mode: "ai_conducted",
+      scheduledAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+      startedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+      completedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000 + 20 * 60 * 1000),
+      durationSeconds: 1200,
+      status: "completed",
+      overallScore: 92,
+      detailedScores: {
+        technical: 95,
+        communication: 88,
+        problemSolving: 94,
+        confidence: 90,
+      },
+      strengths: ["Exceptional PyTorch and transformer knowledge", "Strong systems thinking for distributed inference"],
+      aiRecommendation: "strong_hire",
+      securityScore: 100,
+      totalViolations: 0,
+      faceVisibilityPercentage: 100,
+      integrityVerified: true,
+      questions: [
+        {
+          questionText: "Describe the trade-offs between Quantization (e.g. INT8/FP4) and model pruning.",
+          question: "Describe the trade-offs between Quantization (e.g. INT8/FP4) and model pruning.",
+          category: "technical",
+          difficulty: "hard",
+          timeLimitSeconds: 60,
+          order: 1,
+        },
+      ],
+      answers: [
+        {
+          questionIndex: 0,
+          answerText: "Quantization reduces memory footprint and increases throughput by reducing weight precision, while pruning removes redundant weights entirely.",
+          score: 92,
+          duration: 50,
+        },
+      ],
+    });
+
+    // Create Notifications
+    console.log("Creating notifications...");
+    await Notification.create({
+      userId: candidate1._id,
+      type: "interview_completed",
+      title: "Interview Evaluated",
+      message: "Your AI technical interview for Senior Full Stack Developer has been scored: 88%. Strong Hire recommendation!",
+      read: false,
+      link: "/dashboard",
+    });
+
+    await Notification.create({
+      userId: candidate1._id,
+      type: "interview_scheduled",
+      title: "Upcoming AI Interview",
+      message: "Your interview for Frontend Engineer (React / Next.js) is scheduled and ready to begin.",
+      read: false,
+      link: "/interviews",
+    });
+
+    await Notification.create({
+      userId: recruiter1._id,
+      type: "application_received",
+      title: "New Top Candidate Application",
+      message: "Alice Developer applied for Senior Full Stack Developer with 92% resume match.",
+      read: false,
+      link: "/recruiter/dashboard",
+    });
+
+    console.log("✅ Database seeded successfully with complete real-world data!");
     console.log("\nDemo Credentials:");
-    console.log("Recruiter: recruiter@example.com / password123");
-    console.log("Candidate: candidate@example.com / password123");
+    console.log("• Recruiter: recruiter@example.com / password123");
+    console.log("• Candidate: candidate@example.com / password123");
 
     await mongoose.connection.close();
     process.exit(0);
   } catch (error) {
-    console.error("Error seeding database:", error);
+    console.error("❌ Error seeding database:", error);
     process.exit(1);
   }
 }

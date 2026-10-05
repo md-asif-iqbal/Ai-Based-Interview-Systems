@@ -18,6 +18,9 @@ import {
   Calendar,
   Search,
   Building2,
+  Award,
+  HelpCircle,
+  XCircle,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -215,7 +218,7 @@ export default function RecruiterDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-background via-background to-accent/2">
+    <div className="min-h-screen bg-white dark:bg-[#010736] text-[#010736] dark:text-white transition-colors duration-200">
       <div className="mx-auto max-w-7xl px-4 py-8">
         {/* Header */}
         <motion.div
@@ -224,20 +227,20 @@ export default function RecruiterDashboard() {
           className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8"
         >
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold">
-              Recruiter <span className="bg-linear-to-r from-primary to-accent bg-clip-text text-transparent">Dashboard</span>
+            <h1 className="text-2xl sm:text-3xl font-bold text-[#010736] dark:text-white">
+              Recruiter <span className="text-[#22396F] dark:text-[#FCF1D0]">Dashboard</span>
             </h1>
-            <p className="text-muted-foreground mt-1">Manage your job postings and candidates</p>
+            <p className="text-[#475569] dark:text-[#cbd5e1] mt-1">Manage your job postings and candidates</p>
           </div>
           <div className="flex items-center gap-3">
             <Link href="/recruiter/company">
-              <Button variant="outline" className="gap-2">
+              <Button variant="outline" className="gap-2 border-[#cbd5e1] dark:border-[#22396F] bg-white dark:bg-[#0D1C42] text-[#010736] dark:text-white hover:bg-[#f1f5f9] dark:hover:bg-[#22396F] hover:text-[#22396F] dark:hover:text-[#FCF1D0]">
                 <Building2 className="h-4 w-4" /> Company Profile
               </Button>
             </Link>
             <Dialog open={createOpen} onOpenChange={setCreateOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-linear-to-r from-primary to-accent hover:opacity-90 shadow-lg shadow-primary/20">
+              <Button className="bg-[#010736] text-[#FCF1D0] hover:bg-[#22396F] dark:bg-[#FCF1D0] dark:text-[#010736] dark:hover:bg-white font-semibold shadow-md">
                 <Plus className="h-4 w-4 mr-2" /> Post New Job
               </Button>
             </DialogTrigger>
@@ -349,7 +352,7 @@ export default function RecruiterDashboard() {
                 <Button
                   onClick={handleCreateJob}
                   disabled={creating}
-                  className="bg-linear-to-r from-primary to-accent hover:opacity-90"
+                  className="bg-[#FCF1D0] text-[#010736] hover:bg-white font-semibold"
                 >
                   {creating ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Plus className="h-4 w-4 mr-2" />}
                   {creating ? "Creating..." : "Create Job Posting"}
@@ -363,10 +366,10 @@ export default function RecruiterDashboard() {
         {/* Stats */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
           {[
-            { label: "Active Jobs", value: activeJobs, icon: Briefcase, color: "from-primary/10 to-primary/5", iconColor: "text-primary" },
-            { label: "Total Applications", value: totalApps, icon: Users, color: "from-blue-500/10 to-blue-500/5", iconColor: "text-blue-500" },
-            { label: "Interviews", value: completedInterviews, icon: Video, color: "from-purple-500/10 to-purple-500/5", iconColor: "text-purple-500" },
-            { label: "Recommended", value: strongHires, icon: CheckCircle2, color: "from-green-500/10 to-green-500/5", iconColor: "text-green-500" },
+            { label: "Active Jobs", value: activeJobs, icon: Briefcase, color: "text-[#FCF1D0]" },
+            { label: "Total Applications", value: totalApps, icon: Users, color: "text-blue-400" },
+            { label: "Interviews", value: completedInterviews, icon: Video, color: "text-purple-400" },
+            { label: "Recommended", value: strongHires, icon: CheckCircle2, color: "text-emerald-400" },
           ].map((stat, i) => (
             <motion.div
               key={stat.label}
@@ -374,15 +377,15 @@ export default function RecruiterDashboard() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.05 }}
             >
-              <Card className="border-border/40">
+              <Card className="border-[#cbd5e1] dark:border-[#22396F] bg-white dark:bg-[#0D1C42] text-[#010736] dark:text-white shadow-sm">
                 <CardContent className="p-4">
                   <div className="flex items-center gap-3">
-                    <div className={`flex h-10 w-10 items-center justify-center rounded-xl bg-linear-to-br ${stat.color}`}>
-                      <stat.icon className={`h-5 w-5 ${stat.iconColor}`} />
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#f1f5f9] dark:bg-[#010736] border border-[#cbd5e1] dark:border-[#22396F]">
+                      <stat.icon className={`h-5 w-5 ${stat.color}`} />
                     </div>
                     <div>
-                      <p className="text-2xl font-bold">{stat.value}</p>
-                      <p className="text-xs text-muted-foreground">{stat.label}</p>
+                      <p className="text-2xl font-bold text-[#010736] dark:text-white">{stat.value}</p>
+                      <p className="text-xs text-[#475569] dark:text-[#cbd5e1]">{stat.label}</p>
                     </div>
                   </div>
                 </CardContent>
@@ -392,13 +395,13 @@ export default function RecruiterDashboard() {
         </div>
 
         <Tabs defaultValue="jobs" className="space-y-6">
-          <TabsList className="bg-muted/50">
+          <TabsList className="bg-[#f1f5f9] dark:bg-[#0D1C42] border border-[#cbd5e1] dark:border-[#22396F] text-[#010736] dark:text-white">
             <TabsTrigger value="jobs">Job Postings</TabsTrigger>
             <TabsTrigger value="applications">Applications</TabsTrigger>
             <TabsTrigger value="interviews">
               Interview Results
               {completedInterviews > 0 && (
-                <Badge className="ml-1.5 bg-primary/10 text-primary text-[10px] px-1.5">{completedInterviews}</Badge>
+                <Badge className="ml-1.5 bg-[#010736] dark:bg-[#22396F] text-[#FCF1D0] text-[10px] px-1.5">{completedInterviews}</Badge>
               )}
             </TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
@@ -407,12 +410,12 @@ export default function RecruiterDashboard() {
           {/* Jobs Tab */}
           <TabsContent value="jobs" className="space-y-4">
             {jobs.length === 0 ? (
-              <Card className="border-border/40">
+              <Card className="border-[#cbd5e1] dark:border-[#22396F] bg-white dark:bg-[#0D1C42] text-[#010736] dark:text-white">
                 <CardContent className="py-12 text-center">
-                  <Briefcase className="h-12 w-12 mx-auto text-muted-foreground/30 mb-3" />
-                  <h3 className="text-lg font-semibold mb-1">No job postings yet</h3>
-                  <p className="text-sm text-muted-foreground mb-4">Create your first job posting to start receiving applications</p>
-                  <Button onClick={() => setCreateOpen(true)} className="bg-linear-to-r from-primary to-accent hover:opacity-90">
+                  <Briefcase className="h-12 w-12 mx-auto text-[#94a3b8] mb-3" />
+                  <h3 className="text-lg font-semibold mb-1 text-[#010736] dark:text-white">No job postings yet</h3>
+                  <p className="text-sm text-[#475569] dark:text-[#cbd5e1] mb-4">Create your first job posting to start receiving applications</p>
+                  <Button onClick={() => setCreateOpen(true)} className="bg-[#010736] text-[#FCF1D0] hover:bg-[#22396F] dark:bg-[#FCF1D0] dark:text-[#010736] dark:hover:bg-white font-semibold">
                     <Plus className="h-4 w-4 mr-2" /> Post a Job
                   </Button>
                 </CardContent>
@@ -451,9 +454,9 @@ export default function RecruiterDashboard() {
                         </TableCell>
                         <TableCell>
                           <Badge className={`text-[10px] ${
-                            job.status === "active" ? "bg-green-500/10 text-green-600 border-0" :
-                            job.status === "closed" ? "bg-red-500/10 text-red-600 border-0" :
-                            "bg-yellow-500/10 text-yellow-600 border-0"
+                            job.status === "active" ? "bg-[#FCF1D0] text-[#010736] border-0 font-semibold" :
+                            job.status === "closed" ? "bg-[#010736] text-[#cbd5e1] border border-[#22396F]" :
+                            "bg-[#22396F] text-[#FCF1D0] border-0"
                           }`}>
                             {job.status}
                           </Badge>
@@ -587,13 +590,13 @@ export default function RecruiterDashboard() {
                         const jobTitle = interview.applicationId?.jobId?.title || "Position";
                         const score = interview.overallScore || 0;
                         const rec = interview.aiRecommendation;
-                        const recConfig: Record<string, { label: string; color: string; bg: string }> = {
-                          strong_hire: { label: "🌟 Strong Hire", color: "text-green-600", bg: "bg-green-500/10 border-green-500/20" },
-                          hire: { label: "✅ Hire", color: "text-emerald-600", bg: "bg-emerald-500/10 border-emerald-500/20" },
-                          maybe: { label: "🤔 Maybe", color: "text-yellow-600", bg: "bg-yellow-500/10 border-yellow-500/20" },
-                          no_hire: { label: "❌ No Hire", color: "text-red-600", bg: "bg-red-500/10 border-red-500/20" },
+                        const recConfig: Record<string, { label: string; color: string; bg: string; icon: any }> = {
+                          strong_hire: { label: "Strong Hire", color: "text-[#010736]", bg: "bg-[#FCF1D0] font-bold", icon: Award },
+                          hire: { label: "Hire", color: "text-[#FCF1D0]", bg: "bg-[#22396F]", icon: CheckCircle2 },
+                          maybe: { label: "Maybe", color: "text-white", bg: "bg-[#0D1C42] border border-[#22396F]", icon: HelpCircle },
+                          no_hire: { label: "No Hire", color: "text-white", bg: "bg-[#010736] border border-[#22396F]", icon: XCircle },
                         };
-                        const recInfo = recConfig[rec || ""] || { label: "Pending", color: "text-muted-foreground", bg: "bg-muted/50" };
+                        const recInfo = recConfig[rec || ""] || { label: "Pending", color: "text-muted-foreground", bg: "bg-muted/50", icon: HelpCircle };
 
                         return (
                           <motion.div
@@ -609,7 +612,8 @@ export default function RecruiterDashboard() {
                                     <p className="font-semibold text-sm truncate">{candidateName}</p>
                                     <p className="text-xs text-muted-foreground truncate">{jobTitle}</p>
                                   </div>
-                                  <Badge className={`text-[10px] shrink-0 ml-2 border ${recInfo.bg} ${recInfo.color}`}>
+                                  <Badge className={`text-[10px] shrink-0 ml-2 border flex items-center gap-1 ${recInfo.bg} ${recInfo.color}`}>
+                                    <recInfo.icon className="h-3 w-3" />
                                     {recInfo.label}
                                   </Badge>
                                 </div>
@@ -718,16 +722,16 @@ export default function RecruiterDashboard() {
                         const score = interview.overallScore;
                         const rec = interview.aiRecommendation;
                         const recLabels: Record<string, string> = {
-                          strong_hire: "🌟 Strong Hire",
-                          hire: "✅ Hire",
-                          maybe: "🤔 Maybe",
-                          no_hire: "❌ No Hire",
+                          strong_hire: "Strong Hire",
+                          hire: "Hire",
+                          maybe: "Maybe",
+                          no_hire: "No Hire",
                         };
                         const recColors: Record<string, string> = {
-                          strong_hire: "bg-green-500/10 text-green-600",
-                          hire: "bg-emerald-500/10 text-emerald-600",
-                          maybe: "bg-yellow-500/10 text-yellow-600",
-                          no_hire: "bg-red-500/10 text-red-600",
+                          strong_hire: "bg-[#FCF1D0] text-[#010736] font-bold",
+                          hire: "bg-[#22396F] text-[#FCF1D0]",
+                          maybe: "bg-[#0D1C42] border border-[#22396F] text-white",
+                          no_hire: "bg-[#010736] border border-[#22396F] text-white",
                         };
 
                         return (
@@ -742,7 +746,7 @@ export default function RecruiterDashboard() {
                             <TableCell>
                               {score != null ? (
                                 <div className="flex items-center gap-1.5">
-                                  <div className={`h-2 w-2 rounded-full ${score >= 70 ? "bg-green-500" : score >= 40 ? "bg-yellow-500" : "bg-red-500"}`} />
+                                  <div className="h-2 w-2 rounded-full bg-[#FCF1D0]" />
                                   <span className="text-sm font-semibold">{score}%</span>
                                 </div>
                               ) : (
@@ -751,7 +755,11 @@ export default function RecruiterDashboard() {
                             </TableCell>
                             <TableCell>
                               {rec ? (
-                                <Badge className={`text-[10px] border-0 ${recColors[rec] || "bg-muted"}`}>
+                                <Badge className={`text-[10px] border-0 inline-flex items-center gap-1 ${recColors[rec] || "bg-muted"}`}>
+                                  {rec === "strong_hire" && <Award className="h-3 w-3" />}
+                                  {rec === "hire" && <CheckCircle2 className="h-3 w-3" />}
+                                  {rec === "maybe" && <HelpCircle className="h-3 w-3" />}
+                                  {rec === "no_hire" && <XCircle className="h-3 w-3" />}
                                   {recLabels[rec] || rec}
                                 </Badge>
                               ) : (
@@ -760,10 +768,10 @@ export default function RecruiterDashboard() {
                             </TableCell>
                             <TableCell className="hidden md:table-cell">
                               <Badge className={`text-[10px] ${
-                                interview.status === "completed" ? "bg-green-500/10 text-green-600 border-0" :
-                                interview.status === "in_progress" ? "bg-blue-500/10 text-blue-600 border-0" :
-                                interview.status === "terminated" ? "bg-red-500/10 text-red-600 border-0" :
-                                "bg-yellow-500/10 text-yellow-600 border-0"
+                                interview.status === "completed" ? "bg-[#FCF1D0] text-[#010736] border-0 font-semibold" :
+                                interview.status === "in_progress" ? "bg-[#22396F] text-[#FCF1D0] border-0" :
+                                interview.status === "terminated" ? "bg-[#010736] border border-[#22396F] text-white" :
+                                "bg-[#0D1C42] border border-[#22396F] text-white"
                               }`}>
                                 {interview.status === "in_progress" ? "In Progress" : interview.status}
                               </Badge>
@@ -789,11 +797,11 @@ export default function RecruiterDashboard() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {[
-                    { label: "Applied", count: totalApps, pct: 100, color: "bg-blue-500" },
-                    { label: "Reviewed", count: Math.round(totalApps * 0.7), pct: 70, color: "bg-indigo-500" },
-                    { label: "Shortlisted", count: Math.round(totalApps * 0.3), pct: 30, color: "bg-purple-500" },
-                    { label: "Interviewed", count: Math.round(totalApps * 0.15), pct: 15, color: "bg-violet-500" },
-                    { label: "Hired", count: Math.round(totalApps * 0.05), pct: 5, color: "bg-green-500" },
+                    { label: "Applied", count: totalApps, pct: 100, color: "bg-[#22396F]" },
+                    { label: "Reviewed", count: Math.round(totalApps * 0.7), pct: 70, color: "bg-[#22396F]" },
+                    { label: "Shortlisted", count: Math.round(totalApps * 0.3), pct: 30, color: "bg-[#FCF1D0]" },
+                    { label: "Interviewed", count: Math.round(totalApps * 0.15), pct: 15, color: "bg-[#FCF1D0]" },
+                    { label: "Hired", count: Math.round(totalApps * 0.05), pct: 5, color: "bg-white" },
                   ].map((stage) => (
                     <div key={stage.label} className="space-y-1.5">
                       <div className="flex items-center justify-between text-sm">

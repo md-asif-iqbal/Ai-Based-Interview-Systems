@@ -161,7 +161,7 @@ export default function CompanyProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-background via-background to-accent/2">
+    <div className="min-h-screen bg-white dark:bg-[#010736] text-[#010736] dark:text-white transition-colors duration-200">
       <div className="mx-auto max-w-3xl px-4 py-8">
         {/* Header */}
         <motion.div
@@ -171,18 +171,18 @@ export default function CompanyProfilePage() {
         >
           <div className="flex items-center gap-4">
             <Link href="/recruiter/dashboard">
-              <Button variant="ghost" size="icon">
+              <Button variant="ghost" size="icon" className="text-[#475569] dark:text-[#cbd5e1] hover:text-[#010736] dark:hover:text-[#FCF1D0] hover:bg-[#f1f5f9] dark:hover:bg-[#0D1C42]">
                 <ArrowLeft className="h-5 w-5" />
               </Button>
             </Link>
             <div>
-              <h1 className="text-2xl font-bold">
+              <h1 className="text-2xl font-bold text-[#010736] dark:text-white">
                 Company{" "}
-                <span className="bg-linear-to-r from-primary to-accent bg-clip-text text-transparent">
+                <span className="text-[#22396F] dark:text-[#FCF1D0]">
                   Profile
                 </span>
               </h1>
-              <p className="text-sm text-muted-foreground mt-0.5">
+              <p className="text-sm text-[#475569] dark:text-[#cbd5e1] mt-0.5">
                 {hasCompany
                   ? "Manage your company information"
                   : "Set up your company profile to start posting jobs"}
@@ -190,7 +190,7 @@ export default function CompanyProfilePage() {
             </div>
           </div>
           {hasCompany && !editing && (
-            <Button onClick={() => setEditing(true)} variant="outline" className="gap-2">
+            <Button onClick={() => setEditing(true)} variant="outline" className="gap-2 border-[#cbd5e1] dark:border-[#22396F] bg-white dark:bg-[#0D1C42] text-[#010736] dark:text-white hover:bg-[#f1f5f9] dark:hover:bg-[#22396F] hover:text-[#22396F] dark:hover:text-[#FCF1D0]">
               <Pencil className="h-4 w-4" /> Edit
             </Button>
           )}
@@ -203,10 +203,10 @@ export default function CompanyProfilePage() {
             animate={{ opacity: 1, y: 0 }}
             className="space-y-6"
           >
-            <Card className="border-border/40 overflow-hidden">
-              <div className="bg-linear-to-r from-primary/5 to-accent/5 p-6">
+            <Card className="border-[#cbd5e1] dark:border-[#22396F] bg-white dark:bg-[#0D1C42] text-[#010736] dark:text-white overflow-hidden shadow-sm">
+              <div className="bg-[#f8fafc] dark:bg-[#22396F] p-6 border-b border-[#cbd5e1] dark:border-[#22396F]">
                 <div className="flex items-center gap-4">
-                  <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 border border-primary/20">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white dark:bg-[#010736] border border-[#cbd5e1] dark:border-[#22396F]">
                     {company.logo ? (
                       <Image
                         src={company.logo}
@@ -216,7 +216,7 @@ export default function CompanyProfilePage() {
                         className="h-12 w-12 rounded-xl object-cover"
                       />
                     ) : (
-                      <Building2 className="h-8 w-8 text-primary" />
+                      <Building2 className="h-8 w-8 text-[#22396F] dark:text-[#FCF1D0]" />
                     )}
                   </div>
                   <div>
@@ -392,7 +392,7 @@ export default function CompanyProfilePage() {
                   <Button
                     onClick={handleSave}
                     disabled={saving}
-                    className="bg-linear-to-r from-primary to-accent hover:opacity-90 shadow-lg shadow-primary/20"
+                    className="bg-[#FCF1D0] text-[#010736] hover:bg-white font-semibold shadow-md"
                   >
                     {saving ? (
                       <Loader2 className="h-4 w-4 animate-spin mr-2" />

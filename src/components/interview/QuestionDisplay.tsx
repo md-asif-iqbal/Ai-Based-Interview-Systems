@@ -49,9 +49,9 @@ export default function QuestionDisplay({
   };
 
   const difficultyColors: Record<string, string> = {
-    easy: "bg-green-500/10 text-green-600 border-green-500/20",
-    medium: "bg-yellow-500/10 text-yellow-600 border-yellow-500/20",
-    hard: "bg-red-500/10 text-red-600 border-red-500/20",
+    easy: "bg-[#22396F] text-[#FCF1D0] border-0",
+    medium: "bg-[#0D1C42] border border-[#22396F] text-white",
+    hard: "bg-[#FCF1D0] text-[#010736] border-0 font-bold",
   };
 
   const formatTime = (seconds: number) => {

@@ -4,7 +4,6 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   Brain,
-  Sparkles,
   Shield,
   Zap,
   Users,
@@ -29,14 +28,9 @@ const stagger = {
 
 export default function HomePage() {
   return (
-    <div className="relative overflow-hidden">
+    <div className="relative overflow-hidden bg-white dark:bg-[#010736] text-[#010736] dark:text-white transition-colors duration-200">
       {/* Hero Section */}
-      <section className="relative py-20 sm:py-28 lg:py-36">
-        <div className="absolute inset-0 -z-10">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-200 h-200 bg-linear-to-br from-primary/20 via-accent/10 to-transparent rounded-full blur-3xl" />
-          <div className="absolute bottom-0 right-0 w-100 h-100 bg-linear-to-tl from-accent/15 to-transparent rounded-full blur-3xl" />
-        </div>
-
+      <section className="relative py-20 sm:py-28 lg:py-36 border-b border-[#cbd5e1] dark:border-[#22396F]">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <motion.div
             initial="hidden"
@@ -46,20 +40,20 @@ export default function HomePage() {
           >
             <motion.div variants={fadeUp}>
               <Badge
-                variant="secondary"
-                className="mb-6 px-4 py-1.5 text-sm font-medium bg-primary/10 text-primary border-primary/20 hover:bg-primary/15"
+                variant="outline"
+                className="mb-6 px-4 py-1.5 text-sm font-medium bg-[#f1f5f9] text-[#010736] border-[#cbd5e1] dark:bg-[#0D1C42] dark:text-[#FCF1D0] dark:border-[#22396F] hover:bg-[#e2e8f0] dark:hover:bg-[#22396F]"
               >
-                <Sparkles className="h-3.5 w-3.5 mr-1.5" />
+                <Brain className="h-3.5 w-3.5 mr-1.5 text-[#22396F] dark:text-[#FCF1D0]" />
                 Powered by Google Gemini AI
               </Badge>
             </motion.div>
 
             <motion.h1
               variants={fadeUp}
-              className="text-4xl sm:text-5xl lg:text-7xl font-bold tracking-tight leading-[1.1] mb-6"
+              className="text-4xl sm:text-5xl lg:text-7xl font-bold tracking-tight leading-[1.1] mb-6 text-[#010736] dark:text-white"
             >
               Hire Smarter with{" "}
-              <span className="bg-linear-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+              <span className="text-[#22396F] dark:text-[#FCF1D0]">
                 AI-Powered
               </span>{" "}
               Interviews
@@ -67,11 +61,11 @@ export default function HomePage() {
 
             <motion.p
               variants={fadeUp}
-              className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed"
+              className="text-lg sm:text-xl text-[#475569] dark:text-[#cbd5e1] max-w-2xl mx-auto mb-10 leading-relaxed"
             >
-              NaaSMind uses artificial intelligence to parse resumes, generate
-              interview questions, evaluate answers in real-time, and ensure
-              interview integrity — all automatically.
+              InterviewIQ uses artificial intelligence to parse resumes, generate
+              tailored interview questions, evaluate responses in real-time, and ensure
+              interview integrity with automated proctoring.
             </motion.p>
 
             <motion.div
@@ -81,7 +75,7 @@ export default function HomePage() {
               <Button
                 size="lg"
                 asChild
-                className="h-13 px-8 text-base bg-linear-to-r from-primary to-accent hover:opacity-90 shadow-xl shadow-primary/30 transition-all hover:shadow-primary/40 hover:scale-105"
+                className="h-13 px-8 text-base bg-[#010736] text-[#FCF1D0] hover:bg-[#22396F] dark:bg-[#FCF1D0] dark:text-[#010736] dark:hover:bg-white font-semibold transition-all hover:scale-105 border-0 shadow-md"
               >
                 <Link href="/signup">
                   Get Started Free
@@ -92,7 +86,7 @@ export default function HomePage() {
                 size="lg"
                 variant="outline"
                 asChild
-                className="h-13 px-8 text-base border-border/60 hover:bg-muted"
+                className="h-13 px-8 text-base border-[#cbd5e1] bg-white text-[#010736] hover:bg-[#f1f5f9] dark:border-[#22396F] dark:bg-[#0D1C42] dark:text-white dark:hover:bg-[#22396F] dark:hover:text-[#FCF1D0]"
               >
                 <Link href="/jobs">Browse Jobs</Link>
               </Button>
@@ -100,19 +94,19 @@ export default function HomePage() {
 
             <motion.div
               variants={fadeUp}
-              className="flex items-center justify-center gap-6 mt-10 text-sm text-muted-foreground"
+              className="flex items-center justify-center gap-6 mt-10 text-sm text-[#475569] dark:text-[#cbd5e1]"
             >
               <span className="flex items-center gap-1.5">
-                <CheckCircle2 className="h-4 w-4 text-accent" />
+                <CheckCircle2 className="h-4 w-4 text-[#22396F] dark:text-[#FCF1D0]" />
                 Free to use
               </span>
               <span className="flex items-center gap-1.5">
-                <CheckCircle2 className="h-4 w-4 text-accent" />
+                <CheckCircle2 className="h-4 w-4 text-[#22396F] dark:text-[#FCF1D0]" />
                 No credit card
               </span>
               <span className="flex items-center gap-1.5">
-                <CheckCircle2 className="h-4 w-4 text-accent" />
-                AI-powered
+                <CheckCircle2 className="h-4 w-4 text-[#22396F] dark:text-[#FCF1D0]" />
+                Full proctoring
               </span>
             </motion.div>
           </motion.div>
@@ -120,7 +114,7 @@ export default function HomePage() {
       </section>
 
       {/* Features Grid */}
-      <section className="py-20 sm:py-28 bg-muted/30">
+      <section id="features" className="py-20 sm:py-28 bg-[#f8fafc] dark:bg-[#0D1C42] border-b border-[#cbd5e1] dark:border-[#22396F]">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <motion.div
             initial="hidden"
@@ -129,12 +123,11 @@ export default function HomePage() {
             variants={stagger}
             className="text-center mb-16"
           >
-            <motion.h2 variants={fadeUp} className="text-3xl sm:text-4xl font-bold mb-4">
-              Everything You Need for{" "}
-              <span className="text-primary">Modern Hiring</span>
+            <motion.h2 variants={fadeUp} className="text-3xl sm:text-4xl font-bold mb-4 text-[#010736] dark:text-white">
+              Everything You Need for <span className="text-[#22396F] dark:text-[#FCF1D0]">Modern Hiring</span>
             </motion.h2>
-            <motion.p variants={fadeUp} className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              From resume parsing to interview proctoring — we&apos;ve got every step covered with cutting-edge AI.
+            <motion.p variants={fadeUp} className="text-[#475569] dark:text-[#cbd5e1] text-lg max-w-2xl mx-auto">
+              From resume parsing to interview proctoring — we cover every step with cutting-edge AI.
             </motion.p>
           </motion.div>
 
@@ -147,13 +140,13 @@ export default function HomePage() {
           >
             {features.map((feature, i) => (
               <motion.div key={i} variants={fadeUp}>
-                <Card className="h-full border-border/40 bg-card/50 backdrop-blur-sm hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 hover:-translate-y-1 group">
+                <Card className="h-full border-[#cbd5e1] dark:border-[#22396F] bg-white dark:bg-[#010736] hover:border-[#22396F] dark:hover:border-[#FCF1D0] transition-all duration-300 hover:-translate-y-1 group shadow-sm">
                   <CardContent className="p-6">
-                    <div className={`inline-flex h-12 w-12 items-center justify-center rounded-xl mb-4 ${feature.color} transition-transform group-hover:scale-110`}>
+                    <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl mb-4 bg-[#f1f5f9] dark:bg-[#0D1C42] border border-[#cbd5e1] dark:border-[#22396F] text-[#22396F] dark:text-[#FCF1D0] transition-transform group-hover:scale-110">
                       <feature.icon className="h-6 w-6" />
                     </div>
-                    <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{feature.description}</p>
+                    <h3 className="text-lg font-semibold mb-2 text-[#010736] dark:text-white">{feature.title}</h3>
+                    <p className="text-sm text-[#475569] dark:text-[#cbd5e1] leading-relaxed">{feature.description}</p>
                   </CardContent>
                 </Card>
               </motion.div>
@@ -163,14 +156,14 @@ export default function HomePage() {
       </section>
 
       {/* How It Works */}
-      <section className="py-20 sm:py-28">
+      <section id="how-it-works" className="py-20 sm:py-28 bg-white dark:bg-[#010736] border-b border-[#cbd5e1] dark:border-[#22396F]">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-16">
-            <motion.h2 variants={fadeUp} className="text-3xl sm:text-4xl font-bold mb-4">
-              How It <span className="text-primary">Works</span>
+            <motion.h2 variants={fadeUp} className="text-3xl sm:text-4xl font-bold mb-4 text-[#010736] dark:text-white">
+              How It <span className="text-[#22396F] dark:text-[#FCF1D0]">Works</span>
             </motion.h2>
-            <motion.p variants={fadeUp} className="text-muted-foreground text-lg">
-              Three simple steps to transform your hiring process
+            <motion.p variants={fadeUp} className="text-[#475569] dark:text-[#cbd5e1] text-lg">
+              Three simple steps to transform your hiring workflow
             </motion.p>
           </motion.div>
 
@@ -182,15 +175,12 @@ export default function HomePage() {
             className="grid grid-cols-1 md:grid-cols-3 gap-8"
           >
             {steps.map((step, i) => (
-              <motion.div key={i} variants={fadeUp} className="relative text-center">
-                <div className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-linear-to-br from-primary to-accent text-primary-foreground text-2xl font-bold mb-6 shadow-lg shadow-primary/25">
+              <motion.div key={i} variants={fadeUp} className="relative text-center p-6 rounded-2xl bg-[#f8fafc] dark:bg-[#0D1C42] border border-[#cbd5e1] dark:border-[#22396F]">
+                <div className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-[#010736] dark:bg-[#22396F] text-[#FCF1D0] text-2xl font-bold mb-6 border border-[#cbd5e1] dark:border-[#FCF1D0]/30 shadow-md">
                   {i + 1}
                 </div>
-                {i < 2 && (
-                  <div className="hidden md:block absolute top-8 left-[60%] w-[80%] border-t-2 border-dashed border-primary/30" />
-                )}
-                <h3 className="text-xl font-semibold mb-3">{step.title}</h3>
-                <p className="text-muted-foreground leading-relaxed">{step.description}</p>
+                <h3 className="text-xl font-semibold mb-3 text-[#010736] dark:text-white">{step.title}</h3>
+                <p className="text-[#475569] dark:text-[#cbd5e1] leading-relaxed">{step.description}</p>
               </motion.div>
             ))}
           </motion.div>
@@ -198,13 +188,13 @@ export default function HomePage() {
       </section>
 
       {/* Stats */}
-      <section className="py-16 bg-linear-to-r from-primary to-accent text-primary-foreground">
+      <section className="py-16 bg-[#f8fafc] dark:bg-[#0D1C42] border-b border-[#cbd5e1] dark:border-[#22396F]">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             {stats.map((stat, i) => (
-              <div key={i}>
-                <div className="text-3xl sm:text-4xl font-bold mb-1">{stat.value}</div>
-                <div className="text-sm opacity-80">{stat.label}</div>
+              <div key={i} className="p-4 rounded-xl bg-white dark:bg-[#010736] border border-[#cbd5e1] dark:border-[#22396F] shadow-sm">
+                <div className="text-3xl sm:text-4xl font-bold mb-1 text-[#010736] dark:text-[#FCF1D0]">{stat.value}</div>
+                <div className="text-sm text-[#475569] dark:text-[#cbd5e1]">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -212,11 +202,11 @@ export default function HomePage() {
       </section>
 
       {/* Testimonials */}
-      <section className="py-20 sm:py-28 bg-muted/30">
+      <section className="py-20 sm:py-28 bg-white dark:bg-[#010736] border-b border-[#cbd5e1] dark:border-[#22396F]">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-16">
-            <motion.h2 variants={fadeUp} className="text-3xl sm:text-4xl font-bold mb-4">
-              Loved by <span className="text-primary">Recruiters & Candidates</span>
+            <motion.h2 variants={fadeUp} className="text-3xl sm:text-4xl font-bold mb-4 text-[#010736] dark:text-white">
+              Trusted by <span className="text-[#22396F] dark:text-[#FCF1D0]">Recruiters & Candidates</span>
             </motion.h2>
           </motion.div>
 
@@ -229,21 +219,21 @@ export default function HomePage() {
           >
             {testimonials.map((t, i) => (
               <motion.div key={i} variants={fadeUp}>
-                <Card className="h-full border-border/40">
+                <Card className="h-full border-[#cbd5e1] dark:border-[#22396F] bg-[#f8fafc] dark:bg-[#0D1C42] shadow-sm">
                   <CardContent className="p-6">
                     <div className="flex gap-1 mb-4">
                       {[...Array(5)].map((_, j) => (
-                        <Star key={j} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                        <Star key={j} className="h-4 w-4 fill-[#22396F] text-[#22396F] dark:fill-[#FCF1D0] dark:text-[#FCF1D0]" />
                       ))}
                     </div>
-                    <p className="text-sm text-muted-foreground mb-4 leading-relaxed">&ldquo;{t.quote}&rdquo;</p>
+                    <p className="text-sm text-[#475569] dark:text-[#cbd5e1] mb-6 leading-relaxed">&ldquo;{t.quote}&rdquo;</p>
                     <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 rounded-full bg-linear-to-br from-primary to-accent flex items-center justify-center text-primary-foreground text-sm font-bold">
+                      <div className="h-10 w-10 rounded-full bg-[#010736] dark:bg-[#22396F] text-[#FCF1D0] border border-[#cbd5e1] dark:border-[#22396F] flex items-center justify-center text-sm font-bold">
                         {t.name[0]}
                       </div>
                       <div>
-                        <p className="text-sm font-medium">{t.name}</p>
-                        <p className="text-xs text-muted-foreground">{t.role}</p>
+                        <p className="text-sm font-semibold text-[#010736] dark:text-white">{t.name}</p>
+                        <p className="text-xs text-[#475569] dark:text-[#cbd5e1]">{t.role}</p>
                       </div>
                     </div>
                   </CardContent>
@@ -255,23 +245,23 @@ export default function HomePage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 sm:py-28">
+      <section className="py-20 sm:py-28 bg-[#f8fafc] dark:bg-[#0D1C42]">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
-            <motion.h2 variants={fadeUp} className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6">
-              Ready to Transform Your <span className="text-primary">Hiring Process?</span>
+            <motion.h2 variants={fadeUp} className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6 text-[#010736] dark:text-white">
+              Ready to Upgrade Your <span className="text-[#22396F] dark:text-[#FCF1D0]">Hiring Workflow?</span>
             </motion.h2>
-            <motion.p variants={fadeUp} className="text-lg text-muted-foreground mb-10 max-w-2xl mx-auto">
-              Join thousands of companies using NaaSMind to find the best talent with AI-powered interviews.
+            <motion.p variants={fadeUp} className="text-lg text-[#475569] dark:text-[#cbd5e1] mb-10 max-w-2xl mx-auto">
+              Empower your recruitment team with objective, AI-evaluated candidate interviews.
             </motion.p>
             <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" asChild className="h-13 px-10 text-base bg-linear-to-r from-primary to-accent hover:opacity-90 shadow-xl shadow-primary/30">
+              <Button size="lg" asChild className="h-13 px-10 text-base bg-[#010736] text-[#FCF1D0] hover:bg-[#22396F] dark:bg-[#FCF1D0] dark:text-[#010736] dark:hover:bg-white font-semibold border-0 shadow-md">
                 <Link href="/signup">
                   Start Hiring with AI
-                  <Sparkles className="ml-2 h-4 w-4" />
+                  <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
-              <Button size="lg" variant="outline" asChild className="h-13 px-10 text-base">
+              <Button size="lg" variant="outline" asChild className="h-13 px-10 text-base border-[#cbd5e1] bg-white text-[#010736] hover:bg-[#f1f5f9] dark:border-[#22396F] dark:bg-[#010736] dark:text-white dark:hover:bg-[#22396F] dark:hover:text-[#FCF1D0]">
                 <Link href="/jobs">I&apos;m a Candidate</Link>
               </Button>
             </motion.div>
@@ -285,54 +275,48 @@ export default function HomePage() {
 const features = [
   {
     title: "AI Resume Parsing",
-    description: "Upload a resume and our AI instantly extracts skills, experience, education, and provides a quality score.",
+    description: "Upload a resume and our AI instantly extracts skills, experience, education, and calculates an objective match score.",
     icon: FileSearch,
-    color: "bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400",
   },
   {
     title: "Smart Question Generation",
-    description: "AI generates role-specific interview questions tailored to each job posting with expected answers.",
+    description: "AI generates role-specific interview questions tailored to each job posting with clear evaluation criteria.",
     icon: Brain,
-    color: "bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400",
   },
   {
     title: "Real-time Answer Evaluation",
-    description: "Answers are evaluated in real-time by AI for relevance, depth, clarity, and technical accuracy.",
+    description: "Answers are analyzed instantly for technical depth, structured communication, and conceptual clarity.",
     icon: Zap,
-    color: "bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400",
   },
   {
     title: "Video Interviews with Proctoring",
-    description: "Secure video interviews with face detection, tab-switch monitoring, and full-screen enforcement.",
+    description: "Secure video interview experience with browser focus tracking, tab-switch monitoring, and full-screen enforcement.",
     icon: Video,
-    color: "bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400",
   },
   {
     title: "Anti-Cheating Security",
-    description: "Comprehensive proctoring detects tab switches, multiple faces, copy-paste, and developer tools.",
+    description: "Comprehensive proctoring flags unauthorized activity, external tabs, copy-pasting, and background interruptions.",
     icon: Shield,
-    color: "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400",
   },
   {
     title: "Resume-Job Matching",
-    description: "Intelligent matching algorithm scores candidates against job requirements with detailed breakdown.",
+    description: "Intelligent matching algorithm scores candidates against role requirements with actionable breakdowns.",
     icon: Users,
-    color: "bg-teal-100 text-teal-600 dark:bg-teal-900/30 dark:text-teal-400",
   },
 ];
 
 const steps = [
   {
     title: "Upload & Parse Resume",
-    description: "Candidates upload their resume. Our AI extracts all relevant information and scores the resume quality.",
+    description: "Candidates upload their resume. Our AI extracts core strengths and matches competencies against the job description.",
   },
   {
     title: "AI-Powered Interview",
-    description: "AI generates role-specific questions. Candidates answer via video with real-time proctoring and evaluation.",
+    description: "Candidates complete an interactive video interview guided by role-specific AI questions and automated proctoring.",
   },
   {
-    title: "Get Results & Hire",
-    description: "Recruiters receive detailed reports with scores, strengths, weaknesses, and AI hiring recommendations.",
+    title: "Review Results & Hire",
+    description: "Recruiters receive a comprehensive candidate report with scores, strengths, weaknesses, and hiring recommendations.",
   },
 ];
 
@@ -344,7 +328,7 @@ const stats = [
 ];
 
 const testimonials = [
-  { quote: "SoftLanding cut our hiring time by 60%. The AI question generation is incredibly accurate and relevant.", name: "Sarah Chen", role: "HR Director, TechCorp" },
-  { quote: "The proctoring system gave us confidence that interviews are fair. The security reports are very detailed.", name: "Ahmed Rahman", role: "CTO, StartupBD" },
-  { quote: "As a candidate, the AI interview felt natural and fair. The instant feedback on my answers was amazing.", name: "Priya Sharma", role: "Software Engineer" },
+  { quote: "InterviewIQ cut our screening time by over half. The automated question generation and scoring are spot on.", name: "Sarah Chen", role: "HR Director, TechCorp" },
+  { quote: "The security and proctoring reports provide total transparency. We can trust every assessment.", name: "Ahmed Rahman", role: "CTO, CloudScale" },
+  { quote: "As a candidate, the interview was streamlined and frictionless. Immediate feedback gave me real confidence.", name: "Priya Sharma", role: "Software Engineer" },
 ];

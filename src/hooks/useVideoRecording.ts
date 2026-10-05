@@ -13,7 +13,7 @@ export function useVideoRecording() {
 
   const startCamera = useCallback(async () => {
     try {
-      console.log("📹 Requesting camera and microphone access...");
+      console.log("[VideoRecording] Requesting camera and microphone access...");
       
       // Check if browser supports getUserMedia
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
@@ -25,7 +25,7 @@ export function useVideoRecording() {
         try {
           const camPerm = await navigator.permissions.query({ name: "camera" as PermissionName });
           const micPerm = await navigator.permissions.query({ name: "microphone" as PermissionName });
-          console.log("📹 Camera permission:", camPerm.state, "| Mic permission:", micPerm.state);
+          console.log("[VideoRecording] Camera permission:", camPerm.state, "| Mic permission:", micPerm.state);
         } catch {
           // permissions.query not supported for camera/mic on some browsers — fine
         }
@@ -45,7 +45,7 @@ export function useVideoRecording() {
         });
       } catch (firstErr: unknown) {
         const errName = (firstErr as { name?: string })?.name;
-        console.warn("⚠️ HD camera failed, trying lower resolution...", errName);
+        console.warn("[VideoRecording] HD camera failed, trying lower resolution...", errName);
 
         // Fallback: simpler constraints
         try {
@@ -55,14 +55,14 @@ export function useVideoRecording() {
           });
         } catch (secondErr: unknown) {
           const err2Name = (secondErr as { name?: string })?.name;
-          console.warn("⚠️ Low-res camera failed, trying bare minimum...", err2Name);
+          console.warn("[VideoRecording] Low-res camera failed, trying bare minimum...", err2Name);
 
           // Final fallback: just video: true, audio: true
           try {
             stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
           } catch (thirdErr: unknown) {
             const err3Name = (thirdErr as { name?: string })?.name;
-            console.warn("⚠️ Video+audio failed, trying audio only...", err3Name);
+            console.warn("[VideoRecording] Video+audio failed, trying audio only...", err3Name);
 
             // Last resort: audio only (some devices may not have a camera at all)
             try {
@@ -79,26 +79,26 @@ export function useVideoRecording() {
         throw new Error("Could not access camera or microphone");
       }
       
-      console.log("✅ Got media stream:", stream.getTracks().map(t => `${t.kind}:${t.enabled}`));
+      console.log("[VideoRecording] Got media stream:", stream.getTracks().map(t => `${t.kind}:${t.enabled}`));
       streamRef.current = stream;
       
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        console.log("✅ Video element srcObject set");
+        console.log("[VideoRecording] Video element srcObject set");
         
         // Force video to play
         try {
           await videoRef.current.play();
-          console.log("✅ Video playing");
+          console.log("[VideoRecording] Video playing");
         } catch (playErr) {
-          console.log("ℹ️ Video play error (may be ok):", playErr);
+          console.log("[VideoRecording] Video play error (may be ok):", playErr);
         }
         
         // Wait for video to load
         await new Promise((resolve) => {
           if (videoRef.current) {
             videoRef.current.onloadedmetadata = () => {
-              console.log("✅ Video metadata loaded");
+              console.log("[VideoRecording] Video metadata loaded");
               resolve(true);
             };
             // Fallback timeout
@@ -111,14 +111,14 @@ export function useVideoRecording() {
       
       setHasPermission(true);
       setError(null);
-      console.log("✅ Camera fully initialized");
+      console.log("[VideoRecording] Camera fully initialized");
     } catch (err: unknown) {
       const error = err as { name?: string; message?: string };
-      console.error("❌ Camera access error:", error.name, error.message);
+      console.error("[VideoRecording] Camera access error:", error.name, error.message);
       let errorMessage = "";
       
       if (error.name === "NotAllowedError" || error.name === "PermissionDeniedError") {
-        errorMessage = "Camera/Microphone blocked! To fix:\n1. Click the 🔒 lock icon in your browser address bar\n2. Set Camera and Microphone to 'Allow'\n3. Reload the page";
+        errorMessage = "Camera/Microphone blocked! To fix:\n1. Click the lock icon in your browser address bar\n2. Set Camera and Microphone to 'Allow'\n3. Reload the page";
       } else if (error.name === "NotFoundError" || error.name === "DevicesNotFoundError") {
         errorMessage = "No camera or microphone found. Please connect a device and try again.";
       } else if (error.name === "NotReadableError" || error.name === "TrackStartError") {
@@ -169,9 +169,9 @@ export function useVideoRecording() {
       mr.start(1000);
       mediaRecorderRef.current = mr;
       setIsRecording(true);
-      console.log("✅ Recording started with mimeType:", mr.mimeType);
+      console.log("[VideoRecording] Recording started with mimeType:", mr.mimeType);
     } catch (err) {
-      console.warn("⚠️ MediaRecorder failed, recording skipped:", err);
+      console.warn("[VideoRecording] MediaRecorder failed, recording skipped:", err);
     }
   }, []);
 

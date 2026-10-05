@@ -139,8 +139,8 @@ export default function ResumeUpload({ onUploadComplete }: ResumeUploadProps) {
               exit={{ opacity: 0 }}
               className="flex flex-col items-center gap-3"
             >
-              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-linear-to-br from-primary/10 to-accent/10">
-                <Upload className="h-6 w-6 text-primary" />
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#010736] border border-[#22396F]">
+                <Upload className="h-6 w-6 text-[#FCF1D0]" />
               </div>
               <div>
                 <p className="text-sm font-medium">
@@ -211,7 +211,7 @@ export default function ResumeUpload({ onUploadComplete }: ResumeUploadProps) {
         <Button
           onClick={handleUpload}
           disabled={uploading}
-          className="w-full h-11 bg-linear-to-r from-primary to-accent hover:opacity-90 shadow-lg shadow-primary/25"
+          className="w-full h-11 bg-[#FCF1D0] text-[#010736] hover:bg-[#f5e6b8] font-semibold transition-colors"
         >
           {uploading ? (
             <><Loader2 className="h-4 w-4 animate-spin mr-2" /> Processing...</>

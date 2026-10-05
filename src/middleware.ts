@@ -7,10 +7,12 @@ const publicPaths = new Set([
   "/login",
   "/signup",
   "/jobs",
+  "/resume-parser",
   "/api/auth/login",
   "/api/auth/signup",
   "/api/auth/google",
   "/api/jobs",
+  "/api/parse-resume",
 ]);
 
 const publicPrefixes = [
@@ -18,6 +20,7 @@ const publicPrefixes = [
   "/favicon",
   "/jobs/",
   "/api/jobs/",
+  "/api/parse-resume",
 ];
 
 export async function middleware(request: NextRequest) {

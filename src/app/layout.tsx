@@ -16,11 +16,17 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SoftLanding — AI-Powered Interview Platform",
+  title: "InterviewIQ — AI-Powered Interview & Assessment Platform",
   description:
     "Hire smarter with AI-driven interviews, resume parsing, and intelligent candidate evaluation. Built for modern recruiting.",
-  keywords: ["AI interview", "hiring platform", "resume parser", "candidate evaluation"],
+  keywords: ["AI interview", "hiring platform", "resume parser", "candidate evaluation", "InterviewIQ"],
+  icons: {
+    icon: "/favicon.png",
+    apple: "/logo-128.png",
+  },
 };
+
+import { ThemeProvider } from "@/components/theme-provider";
 
 export default function RootLayout({
   children,
@@ -30,12 +36,19 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col bg-background text-foreground transition-colors duration-200`}
       >
-        <Navbar />
-        <main className="flex-1">{children}</main>
-        <Footer />
-        <Toaster position="top-right" richColors />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem={false}
+          disableTransitionOnChange={false}
+        >
+          <Navbar />
+          <main className="flex-1">{children}</main>
+          <Footer />
+          <Toaster position="top-right" richColors />
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -37,10 +37,10 @@ interface Job {
 }
 
 const statusMap: Record<string, { label: string; color: string; bg: string; icon: React.ReactNode }> = {
-  active: { label: "Active", color: "text-green-600", bg: "bg-green-500/10", icon: <CheckCircle2 className="h-3 w-3" /> },
-  closed: { label: "Closed", color: "text-red-600", bg: "bg-red-500/10", icon: <XCircle className="h-3 w-3" /> },
-  draft: { label: "Draft", color: "text-yellow-600", bg: "bg-yellow-500/10", icon: <Clock className="h-3 w-3" /> },
-  paused: { label: "Paused", color: "text-gray-600", bg: "bg-gray-500/10", icon: <Clock className="h-3 w-3" /> },
+  active: { label: "Active", color: "text-[#010736]", bg: "bg-[#FCF1D0] font-semibold", icon: <CheckCircle2 className="h-3 w-3" /> },
+  closed: { label: "Closed", color: "text-white", bg: "bg-[#010736] border border-[#22396F]", icon: <XCircle className="h-3 w-3" /> },
+  draft: { label: "Draft", color: "text-[#FCF1D0]", bg: "bg-[#22396F]", icon: <Clock className="h-3 w-3" /> },
+  paused: { label: "Paused", color: "text-[#cbd5e1]", bg: "bg-[#0D1C42] border border-[#22396F]", icon: <Clock className="h-3 w-3" /> },
 };
 
 export default function RecruiterJobsPage() {
@@ -88,25 +88,25 @@ export default function RecruiterJobsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-accent/3">
+    <div className="min-h-screen bg-white dark:bg-[#010736] text-[#010736] dark:text-white transition-colors duration-200">
       <div className="mx-auto max-w-5xl px-4 py-8">
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
-          <Button variant="ghost" size="sm" onClick={() => router.back()} className="mb-4 gap-2">
+          <Button variant="ghost" size="sm" onClick={() => router.back()} className="mb-4 gap-2 text-[#475569] dark:text-[#cbd5e1] hover:text-[#010736] dark:hover:text-[#FCF1D0] hover:bg-[#f1f5f9] dark:hover:bg-[#0D1C42]">
             <ArrowLeft className="h-4 w-4" /> Back
           </Button>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold">
+              <h1 className="text-2xl sm:text-3xl font-bold text-[#010736] dark:text-white">
                 My{" "}
-                <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                <span className="text-[#22396F] dark:text-[#FCF1D0]">
                   Job Postings
                 </span>
               </h1>
-              <p className="text-muted-foreground mt-1">Manage all your job postings</p>
+              <p className="text-[#475569] dark:text-[#cbd5e1] mt-1">Manage all your job postings</p>
             </div>
             <Link href="/recruiter/dashboard">
-              <Button className="bg-gradient-to-r from-primary to-accent hover:opacity-90 gap-2">
+              <Button className="bg-[#010736] text-[#FCF1D0] hover:bg-[#22396F] dark:bg-[#FCF1D0] dark:text-[#010736] dark:hover:bg-white font-semibold gap-2 shadow-md">
                 <Plus className="h-4 w-4" /> Post New Job
               </Button>
             </Link>
@@ -121,18 +121,18 @@ export default function RecruiterJobsPage() {
           className="grid grid-cols-3 gap-3 mb-6"
         >
           {[
-            { label: "Total Jobs", value: stats.total, icon: Briefcase, color: "text-primary" },
-            { label: "Active", value: stats.active, icon: Eye, color: "text-green-500" },
+            { label: "Total Jobs", value: stats.total, icon: Briefcase, color: "text-[#22396F] dark:text-[#FCF1D0]" },
+            { label: "Active", value: stats.active, icon: Eye, color: "text-emerald-500" },
             { label: "Closed", value: stats.closed, icon: XCircle, color: "text-red-500" },
           ].map((s) => (
-            <Card key={s.label} className="border-border/40">
+            <Card key={s.label} className="border-[#cbd5e1] dark:border-[#22396F] bg-white dark:bg-[#0D1C42] text-[#010736] dark:text-white shadow-sm">
               <CardContent className="p-4 flex items-center gap-3">
-                <div className="h-9 w-9 rounded-xl bg-muted/50 flex items-center justify-center shrink-0">
+                <div className="h-9 w-9 rounded-xl bg-[#f1f5f9] dark:bg-[#010736] border border-[#cbd5e1] dark:border-[#22396F] flex items-center justify-center shrink-0">
                   <s.icon className={`h-4 w-4 ${s.color}`} />
                 </div>
                 <div>
-                  <p className="text-xl font-bold">{s.value}</p>
-                  <p className="text-[11px] text-muted-foreground">{s.label}</p>
+                  <p className="text-xl font-bold text-[#010736] dark:text-white">{s.value}</p>
+                  <p className="text-[11px] text-[#475569] dark:text-[#cbd5e1]">{s.label}</p>
                 </div>
               </CardContent>
             </Card>
@@ -147,12 +147,12 @@ export default function RecruiterJobsPage() {
           className="mb-6"
         >
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#475569] dark:text-[#cbd5e1]" />
             <Input
               placeholder="Search jobs..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-9"
+              className="pl-9 bg-white dark:bg-[#010736] border-[#cbd5e1] dark:border-[#22396F] text-[#010736] dark:text-white placeholder:text-[#94a3b8] focus:border-[#22396F] dark:focus:border-[#FCF1D0]"
             />
           </div>
         </motion.div>
@@ -186,8 +186,8 @@ export default function RecruiterJobsPage() {
                   <Card className="border-border/40 hover:border-primary/20 hover:shadow-md transition-all group cursor-pointer">
                     <CardContent className="p-4 sm:p-5">
                       <div className="flex flex-col sm:flex-row gap-4">
-                        <div className="hidden sm:flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary/10 to-accent/10">
-                          <Briefcase className="h-5 w-5 text-primary" />
+                        <div className="hidden sm:flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#010736] border border-[#22396F] text-[#FCF1D0]">
+                          <Briefcase className="h-5 w-5 text-[#FCF1D0]" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between gap-2">

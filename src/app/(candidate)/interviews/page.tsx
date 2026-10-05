@@ -66,29 +66,24 @@ interface InterviewItem {
 }
 
 const statusConfig: Record<string, { label: string; color: string; bg: string; border: string }> = {
-  scheduled: { label: "Scheduled", color: "text-blue-600", bg: "bg-blue-500/10", border: "border-blue-500/20" },
-  ready: { label: "Ready", color: "text-green-600", bg: "bg-green-500/10", border: "border-green-500/20" },
-  in_progress: { label: "In Progress", color: "text-orange-600", bg: "bg-orange-500/10", border: "border-orange-500/20" },
-  completed: { label: "Completed", color: "text-purple-600", bg: "bg-purple-500/10", border: "border-purple-500/20" },
-  terminated: { label: "Terminated", color: "text-red-600", bg: "bg-red-500/10", border: "border-red-500/20" },
-  cancelled: { label: "Cancelled", color: "text-gray-600", bg: "bg-gray-500/10", border: "border-gray-500/20" },
+  scheduled: { label: "Scheduled", color: "text-[#FCF1D0]", bg: "bg-[#22396F]", border: "border-0" },
+  ready: { label: "Ready", color: "text-[#010736]", bg: "bg-[#FCF1D0]", border: "border-0 font-semibold" },
+  in_progress: { label: "In Progress", color: "text-white", bg: "bg-[#0D1C42]", border: "border-[#22396F]" },
+  completed: { label: "Completed", color: "text-[#010736]", bg: "bg-[#FCF1D0]", border: "border-0 font-bold" },
+  terminated: { label: "Terminated", color: "text-white", bg: "bg-[#010736]", border: "border-[#22396F]" },
+  cancelled: { label: "Cancelled", color: "text-[#cbd5e1]", bg: "bg-[#010736]", border: "border-0" },
 };
 
 const recConfig: Record<string, { label: string; color: string; bg: string }> = {
-  strong_hire: { label: "Strong Hire", color: "text-emerald-700", bg: "bg-emerald-500/10" },
-  hire: { label: "Hire", color: "text-green-700", bg: "bg-green-500/10" },
-  maybe: { label: "Maybe", color: "text-yellow-700", bg: "bg-yellow-500/10" },
-  no_hire: { label: "No Hire", color: "text-red-700", bg: "bg-red-500/10" },
+  strong_hire: { label: "Strong Hire", color: "text-[#010736]", bg: "bg-[#FCF1D0] font-bold" },
+  hire: { label: "Hire", color: "text-[#FCF1D0]", bg: "bg-[#22396F]" },
+  maybe: { label: "Maybe", color: "text-white", bg: "bg-[#0D1C42] border border-[#22396F]" },
+  no_hire: { label: "No Hire", color: "text-white", bg: "bg-[#010736] border border-[#22396F]" },
 };
 
 function ScoreBadge({ score }: { score: number }) {
-  const color =
-    score >= 85 ? "text-emerald-600 bg-emerald-500/10 border-emerald-500/20"
-    : score >= 70 ? "text-blue-600 bg-blue-500/10 border-blue-500/20"
-    : score >= 50 ? "text-yellow-600 bg-yellow-500/10 border-yellow-500/20"
-    : "text-red-600 bg-red-500/10 border-red-500/20";
   return (
-    <div className={`flex flex-col items-center justify-center h-14 w-14 rounded-xl border font-black text-xl shrink-0 ${color}`}>
+    <div className="flex flex-col items-center justify-center h-14 w-14 rounded-xl border border-[#22396F] bg-[#0D1C42] text-[#FCF1D0] font-black text-xl shrink-0">
       {score}
       <span className="text-[9px] font-normal opacity-70">/ 100</span>
     </div>
@@ -149,20 +144,20 @@ export default function MyInterviewsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-background via-background to-primary/5">
+    <div className="min-h-screen bg-white dark:bg-[#010736] text-[#010736] dark:text-white transition-colors duration-200">
       <div className="mx-auto max-w-4xl px-4 py-8">
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
-          <Button variant="ghost" size="sm" onClick={() => router.back()} className="mb-4 gap-2">
+          <Button variant="ghost" size="sm" onClick={() => router.back()} className="mb-4 gap-2 text-[#64748b] hover:text-[#010736] dark:text-[#cbd5e1] dark:hover:text-[#FCF1D0] hover:bg-[#f1f5f9] dark:hover:bg-[#0D1C42]">
             <ArrowLeft className="h-4 w-4" /> Back
           </Button>
-          <h1 className="text-2xl sm:text-3xl font-bold">
+          <h1 className="text-2xl sm:text-3xl font-bold text-[#010736] dark:text-white">
             My{" "}
-            <span className="bg-linear-to-r from-primary to-blue-600 bg-clip-text text-transparent">
+            <span className="text-[#010736] dark:text-[#FCF1D0]">
               Interviews
             </span>
           </h1>
-          <p className="text-muted-foreground mt-1">View all your AI interviews and scores</p>
+          <p className="text-[#64748b] dark:text-[#cbd5e1] mt-1">View all your AI interviews and scores</p>
         </motion.div>
 
         {/* Stats */}
@@ -173,24 +168,24 @@ export default function MyInterviewsPage() {
           className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6"
         >
           {[
-            { label: "Total", value: interviews.length, icon: Video, color: "text-primary" },
-            { label: "Completed", value: completed.length, icon: CheckCircle2, color: "text-green-500" },
-            { label: "Avg Score", value: completed.length ? `${avgScore}%` : "—", icon: BarChart3, color: "text-blue-500" },
+            { label: "Total", value: interviews.length, icon: Video, color: "text-[#010736] dark:text-[#FCF1D0]" },
+            { label: "Completed", value: completed.length, icon: CheckCircle2, color: "text-emerald-500 dark:text-emerald-400" },
+            { label: "Avg Score", value: completed.length ? `${avgScore}%` : "—", icon: BarChart3, color: "text-blue-500 dark:text-blue-400" },
             {
               label: "Best Score",
               value: best ? `${best.overallScore ?? 0}%` : "—",
               icon: Trophy,
-              color: "text-yellow-500",
+              color: "text-amber-500 dark:text-yellow-400",
             },
           ].map((s) => (
-            <Card key={s.label}>
+            <Card key={s.label} className="border-[#cbd5e1] dark:border-[#22396F] bg-white dark:bg-[#0D1C42] text-[#010736] dark:text-white shadow-sm">
               <CardContent className="p-4 flex items-center gap-3">
-                <div className="h-9 w-9 rounded-xl bg-muted/50 flex items-center justify-center shrink-0">
+                <div className="h-9 w-9 rounded-xl bg-[#f8fafc] dark:bg-[#010736] border border-[#cbd5e1] dark:border-[#22396F] flex items-center justify-center shrink-0">
                   <s.icon className={`h-4 w-4 ${s.color}`} />
                 </div>
                 <div>
-                  <p className="text-xl font-bold">{s.value}</p>
-                  <p className="text-[11px] text-muted-foreground">{s.label}</p>
+                  <p className="text-xl font-bold text-[#010736] dark:text-white">{s.value}</p>
+                  <p className="text-[11px] text-[#64748b] dark:text-[#cbd5e1]">{s.label}</p>
                 </div>
               </CardContent>
             </Card>
@@ -205,20 +200,20 @@ export default function MyInterviewsPage() {
           className="flex flex-col sm:flex-row gap-3 mb-6"
         >
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#64748b] dark:text-[#cbd5e1]" />
             <Input
               placeholder="Search by job title or company..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-9"
+              className="pl-9 bg-white dark:bg-[#010736] border-[#cbd5e1] dark:border-[#22396F] text-[#010736] dark:text-white placeholder:text-[#94a3b8] focus:border-[#22396F] dark:focus:border-[#FCF1D0]"
             />
           </div>
           <Select value={filterStatus} onValueChange={setFilterStatus}>
-            <SelectTrigger className="w-full sm:w-[160px]">
-              <Filter className="h-4 w-4 mr-2" />
+            <SelectTrigger className="w-full sm:w-[160px] bg-white dark:bg-[#010736] border-[#cbd5e1] dark:border-[#22396F] text-[#010736] dark:text-white">
+              <Filter className="h-4 w-4 mr-2 text-[#010736] dark:text-[#FCF1D0]" />
               <SelectValue placeholder="Status" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white dark:bg-[#0D1C42] border-[#cbd5e1] dark:border-[#22396F] text-[#010736] dark:text-white">
               <SelectItem value="all">All Status</SelectItem>
               <SelectItem value="scheduled">Scheduled</SelectItem>
               <SelectItem value="ready">Ready</SelectItem>
@@ -233,20 +228,20 @@ export default function MyInterviewsPage() {
         <div className="space-y-3">
           {filtered.length === 0 ? (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-              <Card>
+              <Card className="border-[#cbd5e1] dark:border-[#22396F] bg-white dark:bg-[#0D1C42] text-[#010736] dark:text-white">
                 <CardContent className="py-16 text-center">
-                  <Video className="h-12 w-12 mx-auto text-muted-foreground/30 mb-3" />
-                  <h3 className="text-lg font-semibold mb-1">
+                  <Video className="h-12 w-12 mx-auto text-[#94a3b8] dark:text-[#cbd5e1]/30 mb-3" />
+                  <h3 className="text-lg font-semibold mb-1 text-[#010736] dark:text-white">
                     {interviews.length === 0 ? "No interviews yet" : "No matching interviews"}
                   </h3>
-                  <p className="text-sm text-muted-foreground mb-4">
+                  <p className="text-sm text-[#64748b] dark:text-[#cbd5e1] mb-4">
                     {interviews.length === 0
                       ? "Apply to jobs to get interview invitations"
                       : "Try adjusting your search or filter"}
                   </p>
                   {interviews.length === 0 && (
                     <Link href="/jobs">
-                      <Button className="bg-linear-to-r from-primary to-blue-600 hover:opacity-90">
+                      <Button className="bg-[#010736] text-[#FCF1D0] hover:bg-[#22396F] dark:bg-[#FCF1D0] dark:text-[#010736] dark:hover:bg-white font-semibold">
                         Browse Jobs
                       </Button>
                     </Link>
@@ -269,7 +264,7 @@ export default function MyInterviewsPage() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.05 * i }}
                 >
-                  <Card className="hover:border-primary/20 hover:shadow-md transition-all">
+                  <Card className="border-[#cbd5e1] dark:border-[#22396F] bg-white dark:bg-[#0D1C42] text-[#010736] dark:text-white hover:border-[#22396F] dark:hover:border-[#FCF1D0] transition-all shadow-sm">
                     <CardContent className="p-4 sm:p-5">
                       <div className="flex gap-4">
                         {/* Score or icon */}
@@ -285,10 +280,10 @@ export default function MyInterviewsPage() {
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between gap-2">
                             <div className="min-w-0">
-                              <h3 className="text-sm sm:text-base font-semibold truncate">
+                              <h3 className="text-sm sm:text-base font-semibold truncate text-[#010736] dark:text-white">
                                 {job?.title || "Interview"}
                               </h3>
-                              <div className="flex flex-wrap items-center gap-2 mt-1 text-xs text-muted-foreground">
+                              <div className="flex flex-wrap items-center gap-2 mt-1 text-xs text-[#64748b] dark:text-[#cbd5e1]">
                                 {job?.companyId?.name && (
                                   <span className="flex items-center gap-1">
                                     <Building2 className="h-3 w-3" />
@@ -296,7 +291,7 @@ export default function MyInterviewsPage() {
                                   </span>
                                 )}
                                 {iv.interviewType && (
-                                  <span className="capitalize text-muted-foreground">{iv.interviewType.replace("_", " ")}</span>
+                                  <span className="capitalize">{iv.interviewType.replace("_", " ")}</span>
                                 )}
                                 <span className="flex items-center gap-1">
                                   <CalendarDays className="h-3 w-3" />
@@ -324,20 +319,16 @@ export default function MyInterviewsPage() {
 
                           {/* Score bar for completed */}
                           {isCompleted && iv.overallScore != null && (
-                            <div className="mt-3 pt-3 border-t border-border/40">
+                            <div className="mt-3 pt-3 border-t border-[#cbd5e1] dark:border-[#22396F]/40">
                               <div className="flex items-center justify-between text-xs mb-1.5">
-                                <span className="text-muted-foreground flex items-center gap-1">
+                                <span className="text-[#64748b] dark:text-[#cbd5e1] flex items-center gap-1">
                                   <TrendingUp className="h-3 w-3" /> Overall Score
                                 </span>
-                                <span className="font-semibold">{iv.overallScore}%</span>
+                                <span className="font-semibold text-[#010736] dark:text-[#FCF1D0]">{iv.overallScore}%</span>
                               </div>
                               <Progress
                                 value={iv.overallScore}
-                                className={`h-1.5 ${
-                                  iv.overallScore >= 70 ? "[&>div]:bg-green-500"
-                                  : iv.overallScore >= 50 ? "[&>div]:bg-yellow-500"
-                                  : "[&>div]:bg-red-500"
-                                }`}
+                                className="h-1.5 [&>div]:bg-[#010736] dark:[&>div]:bg-[#FCF1D0]"
                               />
 
                               {/* Detailed scores */}
@@ -355,8 +346,8 @@ export default function MyInterviewsPage() {
                                     if (v == null) return null;
                                     return (
                                       <div key={key} className="text-center">
-                                        <p className="text-xs font-bold">{v}%</p>
-                                        <p className="text-[9px] text-muted-foreground">{label}</p>
+                                        <p className="text-xs font-bold text-[#010736] dark:text-white">{v}%</p>
+                                        <p className="text-[9px] text-[#64748b] dark:text-[#cbd5e1]">{label}</p>
                                       </div>
                                     );
                                   })}
@@ -367,7 +358,7 @@ export default function MyInterviewsPage() {
 
                           {/* Questions count */}
                           {iv.questions && iv.questions.length > 0 && (
-                            <p className="text-[11px] text-muted-foreground mt-2">
+                            <p className="text-[11px] text-[#64748b] dark:text-[#cbd5e1] mt-2">
                               {iv.questions.length} question{iv.questions.length !== 1 ? "s" : ""}
                             </p>
                           )}
@@ -379,14 +370,14 @@ export default function MyInterviewsPage() {
                             <Link href={`/interview/${iv._id}`}>
                               <Button
                                 size="sm"
-                                className="bg-linear-to-r from-primary to-blue-600 hover:opacity-90 gap-1"
+                                className="bg-[#010736] text-[#FCF1D0] hover:bg-[#22396F] dark:bg-[#FCF1D0] dark:text-[#010736] dark:hover:bg-white font-semibold gap-1 shadow-sm"
                               >
                                 <Play className="h-3 w-3" />
                                 {iv.status === "in_progress" ? "Resume" : "Start"}
                               </Button>
                             </Link>
                           ) : (
-                            <ChevronRight className="h-4 w-4 text-muted-foreground mt-1" />
+                            <ChevronRight className="h-4 w-4 text-[#94a3b8] dark:text-[#cbd5e1] mt-1" />
                           )}
                         </div>
                       </div>

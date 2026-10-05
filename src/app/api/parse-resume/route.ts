@@ -38,7 +38,7 @@ export async function POST(req: Request) {
     try {
       const pdfData = await pdf(buffer);
       pdfText = pdfData.text;
-      console.log("📄 PDF text extracted:", pdfText.substring(0, 200) + "...");
+      console.log("[ResumeParser] PDF text extracted:", pdfText.substring(0, 200) + "...");
     } catch (error) {
       console.error("PDF parsing error:", error);
       return NextResponse.json(
@@ -107,12 +107,12 @@ Please extract and return a JSON object with this COMPLETE structure:
 
 Return ONLY the JSON object, no additional text or explanation. Make sure to extract EVERY piece of information from the resume.`;
 
-    console.log("🤖 Sending to Gemini AI...");
+    console.log("[ResumeParser] Sending to Gemini AI...");
     const result = await model.generateContent(prompt);
     const response = await result.response;
     let text = response.text();
     
-    console.log("📨 Raw Gemini response:", text);
+    console.log("[ResumeParser] Raw Gemini response received");
 
     // Clean the response - remove markdown code blocks if present
     text = text.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
@@ -121,7 +121,7 @@ Return ONLY the JSON object, no additional text or explanation. Make sure to ext
     let parsedData: Record<string, unknown>;
     try {
       parsedData = JSON.parse(text) as Record<string, unknown>;
-      console.log("✅ Successfully parsed JSON:", parsedData);
+      console.log("[ResumeParser] Successfully parsed JSON structure");
     } catch (parseError) {
       console.error("JSON parse error:", parseError);
       console.error("Failed text:", text);
@@ -143,7 +143,7 @@ Return ONLY the JSON object, no additional text or explanation. Make sure to ext
       const filepath = path.join(uploadDir, filename);
       
       await writeFile(filepath, buffer);
-      console.log("💾 File saved:", filepath);
+      console.log("[ResumeParser] File saved:", filepath);
       
       parsedData.uploadedFile = `/uploads/resumes/${filename}`;
     } catch (saveError) {

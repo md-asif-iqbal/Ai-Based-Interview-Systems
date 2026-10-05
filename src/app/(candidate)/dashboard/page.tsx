@@ -17,6 +17,7 @@ import {
   Star,
   Calendar,
   AlertCircle,
+  FlaskConical,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -119,14 +120,14 @@ export default function CandidateDashboard() {
   };
 
   const statusConfig: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
-    applied: { label: "Applied", color: "bg-yellow-500/10 text-yellow-600", icon: <Clock className="h-3 w-3" /> },
-    screening: { label: "Screening", color: "bg-blue-500/10 text-blue-600", icon: <FileText className="h-3 w-3" /> },
-    interview_scheduled: { label: "Interview Scheduled", color: "bg-green-500/10 text-green-600", icon: <Star className="h-3 w-3" /> },
-    interviewed: { label: "Interviewed", color: "bg-purple-500/10 text-purple-600", icon: <Video className="h-3 w-3" /> },
-    under_review: { label: "Under Review", color: "bg-blue-500/10 text-blue-600", icon: <FileText className="h-3 w-3" /> },
-    offer: { label: "Offer", color: "bg-emerald-500/10 text-emerald-600", icon: <CheckCircle2 className="h-3 w-3" /> },
-    rejected: { label: "Rejected", color: "bg-red-500/10 text-red-600", icon: <XCircle className="h-3 w-3" /> },
-    withdrawn: { label: "Withdrawn", color: "bg-gray-500/10 text-gray-600", icon: <XCircle className="h-3 w-3" /> },
+    applied: { label: "Applied", color: "bg-[#22396F] text-[#FCF1D0]", icon: <Clock className="h-3 w-3" /> },
+    screening: { label: "Screening", color: "bg-[#0D1C42] border border-[#22396F] text-white", icon: <FileText className="h-3 w-3" /> },
+    interview_scheduled: { label: "Interview Scheduled", color: "bg-[#FCF1D0] text-[#010736] font-semibold", icon: <Star className="h-3 w-3" /> },
+    interviewed: { label: "Interviewed", color: "bg-[#22396F] text-[#FCF1D0]", icon: <Video className="h-3 w-3" /> },
+    under_review: { label: "Under Review", color: "bg-[#0D1C42] border border-[#22396F] text-white", icon: <FileText className="h-3 w-3" /> },
+    offer: { label: "Offer", color: "bg-[#FCF1D0] text-[#010736] font-bold", icon: <CheckCircle2 className="h-3 w-3" /> },
+    rejected: { label: "Rejected", color: "bg-[#010736] border border-[#22396F] text-white", icon: <XCircle className="h-3 w-3" /> },
+    withdrawn: { label: "Withdrawn", color: "bg-[#010736] text-[#cbd5e1]", icon: <XCircle className="h-3 w-3" /> },
   };
 
   if (loading) {
@@ -138,7 +139,7 @@ export default function CandidateDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-background via-background to-accent/2">
+    <div className="min-h-screen bg-white dark:bg-[#010736] text-[#010736] dark:text-white transition-colors duration-200">
       <div className="mx-auto max-w-7xl px-4 py-8">
         {/* Header */}
         <motion.div
@@ -148,15 +149,16 @@ export default function CandidateDashboard() {
         >
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold">
-                Welcome back, <span className="bg-linear-to-r from-primary to-accent bg-clip-text text-transparent">{user?.fullName?.split(" ")[0] || "Candidate"}</span>
+              <h1 className="text-2xl sm:text-3xl font-bold text-[#010736] dark:text-white">
+                Welcome back, <span className="text-[#22396F] dark:text-[#FCF1D0]">{user?.fullName?.split(" ")[0] || "Candidate"}</span>
               </h1>
-              <p className="text-muted-foreground mt-1">Here&apos;s an overview of your job applications</p>
+              <p className="text-[#475569] dark:text-[#cbd5e1] mt-1">Here is an overview of your job applications</p>
             </div>
             {/* Test AI Button */}
             <Link href="/dashboard/test-ai">
-              <Button variant="outline" className="gap-2">
-                🧪 Test AI Parser
+              <Button variant="outline" className="gap-2 border-[#cbd5e1] dark:border-[#22396F] bg-white dark:bg-[#0D1C42] text-[#010736] dark:text-white hover:bg-[#f1f5f9] dark:hover:bg-[#22396F] hover:text-[#22396F] dark:hover:text-[#FCF1D0]">
+                <FlaskConical className="h-4 w-4" />
+                Test AI Parser
               </Button>
             </Link>
           </div>
@@ -165,10 +167,10 @@ export default function CandidateDashboard() {
         {/* Stats Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
           {[
-            { label: "Total Applications", value: stats.total, icon: Briefcase, color: "from-primary/10 to-primary/5" },
-            { label: "Under Review", value: stats.pending, icon: Clock, color: "from-yellow-500/10 to-yellow-500/5" },
-            { label: "Shortlisted", value: stats.shortlisted, icon: Star, color: "from-green-500/10 to-green-500/5" },
-            { label: "Interviews", value: stats.interviews, icon: Video, color: "from-purple-500/10 to-purple-500/5" },
+            { label: "Total Applications", value: stats.total, icon: Briefcase },
+            { label: "Under Review", value: stats.pending, icon: Clock },
+            { label: "Shortlisted", value: stats.shortlisted, icon: Star },
+            { label: "Interviews", value: stats.interviews, icon: Video },
           ].map((stat, i) => (
             <motion.div
               key={stat.label}
@@ -176,15 +178,15 @@ export default function CandidateDashboard() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.05 }}
             >
-              <Card className="border-border/40">
+              <Card className="border-[#cbd5e1] dark:border-[#22396F] bg-white dark:bg-[#0D1C42] text-[#010736] dark:text-white shadow-sm">
                 <CardContent className="p-4">
                   <div className="flex items-center gap-3">
-                    <div className={`flex h-10 w-10 items-center justify-center rounded-xl bg-linear-to-br ${stat.color}`}>
-                      <stat.icon className="h-5 w-5 text-primary" />
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#f1f5f9] dark:bg-[#22396F] text-[#22396F] dark:text-[#FCF1D0] border border-[#cbd5e1] dark:border-[#22396F]">
+                      <stat.icon className="h-5 w-5 text-[#22396F] dark:text-[#FCF1D0]" />
                     </div>
                     <div>
-                      <p className="text-2xl font-bold">{stat.value}</p>
-                      <p className="text-xs text-muted-foreground">{stat.label}</p>
+                      <p className="text-2xl font-bold text-[#010736] dark:text-white">{stat.value}</p>
+                      <p className="text-xs text-[#475569] dark:text-[#cbd5e1]">{stat.label}</p>
                     </div>
                   </div>
                 </CardContent>
@@ -194,7 +196,7 @@ export default function CandidateDashboard() {
         </div>
 
         <Tabs defaultValue="applications" className="space-y-6">
-          <TabsList className="bg-muted/50">
+          <TabsList className="bg-[#f1f5f9] dark:bg-[#0D1C42] border border-[#cbd5e1] dark:border-[#22396F]">
             <TabsTrigger value="applications">Applications</TabsTrigger>
             <TabsTrigger value="interviews">Interviews</TabsTrigger>
             <TabsTrigger value="resume">Resume</TabsTrigger>
@@ -209,7 +211,7 @@ export default function CandidateDashboard() {
                   <h3 className="text-lg font-semibold mb-1">No applications yet</h3>
                   <p className="text-sm text-muted-foreground mb-4">Start applying to jobs to see them here</p>
                   <Link href="/jobs">
-                    <Button className="bg-linear-to-r from-primary to-accent hover:opacity-90">
+                    <Button className="bg-[#FCF1D0] text-[#010736] hover:bg-white font-semibold">
                       Browse Jobs
                     </Button>
                   </Link>
@@ -311,8 +313,8 @@ export default function CandidateDashboard() {
                         <div className="flex flex-col sm:flex-row sm:items-center gap-3">
                           <div className="flex-1">
                             <div className="flex items-center gap-3">
-                              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-purple-500/10">
-                                <Video className="h-4 w-4 text-purple-500" />
+                              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#010736] border border-[#22396F]">
+                                <Video className="h-4 w-4 text-[#FCF1D0]" />
                               </div>
                               <div>
                                 <h3 className="text-sm font-semibold group-hover:text-primary transition-colors">
@@ -323,12 +325,10 @@ export default function CandidateDashboard() {
                                     variant="outline"
                                     className={`text-[10px] capitalize ${
                                       interview.status === "scheduled"
-                                        ? "text-blue-500 border-blue-500/30"
+                                        ? "text-[#FCF1D0] bg-[#22396F] border-0"
                                         : interview.status === "completed"
-                                        ? "text-green-500 border-green-500/30"
-                                        : interview.status === "in_progress"
-                                        ? "text-orange-500 border-orange-500/30"
-                                        : ""
+                                        ? "text-[#010736] bg-[#FCF1D0] border-0 font-semibold"
+                                        : "text-white bg-[#0D1C42] border-[#22396F]"
                                     }`}
                                   >
                                     {interview.status.replace("_", " ")}
@@ -351,19 +351,19 @@ export default function CandidateDashboard() {
                           <div className="flex items-center gap-3">
                             {interview.status === "completed" && interview.overallScore !== undefined ? (
                               <div className="text-right">
-                                <p className="text-lg font-bold text-primary">{interview.overallScore}%</p>
-                                <p className="text-xs text-muted-foreground">Score</p>
+                                <p className="text-lg font-bold text-[#FCF1D0]">{interview.overallScore}%</p>
+                                <p className="text-xs text-[#cbd5e1]">Score</p>
                               </div>
                             ) : (interview.status === "scheduled" || interview.status === "ready") ? (
-                              <Button size="sm" className="bg-linear-to-r from-primary to-accent hover:opacity-90" onClick={(e) => e.stopPropagation()}>
+                              <Button size="sm" className="bg-[#FCF1D0] text-[#010736] hover:bg-white font-semibold" onClick={(e) => e.stopPropagation()}>
                                 <Video className="h-3 w-3 mr-1" /> Join
                               </Button>
                             ) : interview.status === "in_progress" ? (
-                              <Button size="sm" variant="outline" className="border-orange-500/30 text-orange-500" onClick={(e) => e.stopPropagation()}>
+                              <Button size="sm" variant="outline" className="border-orange-500/30 text-orange-400" onClick={(e) => e.stopPropagation()}>
                                 <Video className="h-3 w-3 mr-1" /> Resume
                               </Button>
                             ) : null}
-                            <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                            <ChevronRight className="h-4 w-4 text-[#cbd5e1] group-hover:text-[#FCF1D0] transition-colors" />
                           </div>
                         </div>
                       </CardContent>
@@ -378,14 +378,14 @@ export default function CandidateDashboard() {
           {/* Resume Tab */}
           <TabsContent value="resume" className="space-y-6">
             {!candidate?.parsedResume ? (
-              <Card className="border-border/40">
+              <Card className="border-[#22396F] bg-[#0D1C42] text-white">
                 <CardContent className="py-8">
                   <div className="text-center mb-6">
-                    <div className="flex h-14 w-14 mx-auto items-center justify-center rounded-2xl bg-primary/10 mb-3">
-                      <Upload className="h-6 w-6 text-primary" />
+                    <div className="flex h-14 w-14 mx-auto items-center justify-center rounded-2xl bg-[#010736] border border-[#22396F] mb-3">
+                      <Upload className="h-6 w-6 text-[#FCF1D0]" />
                     </div>
-                    <h3 className="text-lg font-semibold">Upload Your Resume</h3>
-                    <p className="text-sm text-muted-foreground mt-1">
+                    <h3 className="text-lg font-semibold text-white">Upload Your Resume</h3>
+                    <p className="text-sm text-[#cbd5e1] mt-1">
                       Our AI will analyze your resume and match you with perfect opportunities
                     </p>
                   </div>
@@ -397,14 +397,14 @@ export default function CandidateDashboard() {
             ) : (
               <>
                 <div className="flex items-center justify-between">
-                  <h2 className="text-lg font-semibold">Resume Analysis</h2>
-                  <Button variant="outline" size="sm" onClick={() => setShowResumeUpload(!showResumeUpload)}>
+                  <h2 className="text-lg font-semibold text-white">Resume Analysis</h2>
+                  <Button variant="outline" size="sm" className="border-[#22396F] text-white hover:bg-[#22396F] hover:text-[#FCF1D0]" onClick={() => setShowResumeUpload(!showResumeUpload)}>
                     <Upload className="h-3 w-3 mr-1" /> Re-upload
                   </Button>
                 </div>
                 {showResumeUpload && (
                   <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }}>
-                    <Card className="border-border/40">
+                    <Card className="border-[#22396F] bg-[#0D1C42] text-white">
                       <CardContent className="p-6">
                         <ResumeUpload onUploadComplete={() => { fetchData(); setShowResumeUpload(false); }} />
                       </CardContent>
@@ -416,9 +416,9 @@ export default function CandidateDashboard() {
             )}
 
             {/* AI Recommendations */}
-            <Card className="border-border/40 bg-linear-to-br from-primary/5 to-accent/5">
+            <Card className="border-[#22396F] bg-[#0D1C42] text-white">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-base">
+                <CardTitle className="flex items-center gap-2 text-base text-[#FCF1D0]">
                   <AlertCircle className="h-4 w-4 text-primary" /> AI Recommendations
                 </CardTitle>
               </CardHeader>

@@ -20,8 +20,8 @@ import {
   Star,
   Video,
   FileText,
-  Sparkles,
   AlertCircle,
+  User,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -199,25 +199,25 @@ export default function JobDetailPage() {
 
   const formatSalary = (sal?: { min: number; max: number; currency: string }) => {
     if (!sal) return null;
-    const sym = sal.currency === "BDT" ? "৳" : sal.currency === "EUR" ? "€" : "$";
+    const sym = sal.currency === "BDT" ? "BDT " : sal.currency === "EUR" ? "€" : sal.currency === "GBP" ? "£" : "$";
     return `${sym}${sal.min.toLocaleString()} - ${sym}${sal.max.toLocaleString()} / year`;
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-[#010736] text-[#010736] dark:text-white">
+        <Loader2 className="h-8 w-8 animate-spin text-[#010736] dark:text-[#FCF1D0]" />
       </div>
     );
   }
 
   if (!job) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-4">
-        <Briefcase className="h-16 w-16 text-muted-foreground/30" />
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-white dark:bg-[#010736] text-[#010736] dark:text-white">
+        <Briefcase className="h-16 w-16 text-[#94a3b8]" />
         <h2 className="text-xl font-semibold">Job not found</h2>
         <Link href="/jobs">
-          <Button variant="outline">Browse Jobs</Button>
+          <Button variant="outline" className="border-[#cbd5e1] dark:border-[#22396F] text-[#010736] dark:text-white hover:bg-[#f1f5f9] dark:hover:bg-[#0D1C42]">Browse Jobs</Button>
         </Link>
       </div>
     );
@@ -226,22 +226,22 @@ export default function JobDetailPage() {
   const skills = job.requirements?.skills || [];
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-white dark:bg-[#010736] text-[#010736] dark:text-white transition-colors duration-200">
       {/* Header */}
-      <section className="bg-linear-to-br from-primary/5 via-background to-accent/5 border-b">
+      <section className="bg-[#f8fafc] dark:bg-[#0D1C42] border-b border-[#cbd5e1] dark:border-[#22396F]">
         <div className="mx-auto max-w-5xl px-4 py-8 sm:py-12">
-          <Link href="/jobs" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-primary mb-6">
+          <Link href="/jobs" className="inline-flex items-center gap-1 text-sm text-[#475569] dark:text-[#cbd5e1] hover:text-[#010736] dark:hover:text-[#FCF1D0] mb-6">
             <ArrowLeft className="h-4 w-4" /> Back to Jobs
           </Link>
 
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             <div className="flex flex-col sm:flex-row sm:items-start gap-4">
-              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-linear-to-br from-primary/10 to-accent/10 border">
-                <Building2 className="h-7 w-7 text-primary" />
+              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-white dark:bg-[#010736] border border-[#cbd5e1] dark:border-[#22396F]">
+                <Building2 className="h-7 w-7 text-[#22396F] dark:text-[#FCF1D0]" />
               </div>
               <div className="flex-1 min-w-0">
-                <h1 className="text-2xl sm:text-3xl font-bold mb-2">{job.title}</h1>
-                <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+                <h1 className="text-2xl sm:text-3xl font-bold mb-2 text-[#010736] dark:text-white">{job.title}</h1>
+                <div className="flex flex-wrap items-center gap-3 text-sm text-[#475569] dark:text-[#cbd5e1]">
                   <span className="flex items-center gap-1">
                     <Building2 className="h-4 w-4" /> {job.companyId?.name || "Company"}
                   </span>
@@ -253,12 +253,12 @@ export default function JobDetailPage() {
                   </span>
                 </div>
                 <div className="flex flex-wrap gap-2 mt-3">
-                  <Badge className="bg-primary/10 text-primary border-primary/20 capitalize">
+                  <Badge className="bg-[#f1f5f9] dark:bg-[#22396F] text-[#010736] dark:text-[#FCF1D0] border border-[#cbd5e1] dark:border-[#22396F] capitalize">
                     {job.employmentType?.replace("_", " ") || "Full Time"}
                   </Badge>
-                  {job.remote && <Badge variant="outline">Remote</Badge>}
+                  {job.remote && <Badge variant="outline" className="border-[#cbd5e1] dark:border-[#22396F] text-[#010736] dark:text-white">Remote</Badge>}
                   {formatSalary(job.salaryRange) && (
-                    <Badge variant="secondary">
+                    <Badge variant="secondary" className="bg-[#f1f5f9] dark:bg-[#22396F] text-[#010736] dark:text-[#FCF1D0]">
                       <DollarSign className="h-3 w-3 mr-1" />{formatSalary(job.salaryRange)}
                     </Badge>
                   )}
@@ -270,7 +270,7 @@ export default function JobDetailPage() {
                     size="lg"
                     disabled={applying}
                     onClick={handleApply}
-                    className="bg-linear-to-r from-primary to-accent hover:opacity-90 shadow-lg shadow-primary/25 w-full sm:w-auto"
+                    className="bg-[#010736] text-[#FCF1D0] hover:bg-[#22396F] dark:bg-[#FCF1D0] dark:text-[#010736] dark:hover:bg-white font-semibold shadow-md w-full sm:w-auto"
                   >
                     {applying ? (
                       <><Loader2 className="h-4 w-4 animate-spin mr-2" /> Applying...</>
@@ -280,10 +280,10 @@ export default function JobDetailPage() {
                   </Button>
                 ) : (
                   <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-green-600 text-sm font-medium justify-end">
+                    <div className="flex items-center gap-2 text-emerald-400 text-sm font-medium justify-end">
                       <CheckCircle2 className="h-4 w-4" /> Applied
                       {matchScore != null && (
-                        <Badge variant="secondary" className="text-xs">
+                        <Badge variant="secondary" className="text-xs bg-[#22396F] text-[#FCF1D0]">
                           {matchScore}% Match
                         </Badge>
                       )}
@@ -292,17 +292,17 @@ export default function JobDetailPage() {
                       <Button
                         size="lg"
                         onClick={() => router.push(`/interview/${interviewId}`)}
-                        className="bg-linear-to-r from-green-500 to-emerald-600 hover:opacity-90 shadow-lg shadow-green-500/25 w-full sm:w-auto"
+                        className="bg-[#FCF1D0] hover:bg-[#f5e6b8] text-[#010736] font-bold shadow-md w-full sm:w-auto transition-colors"
                       >
                         <Video className="h-4 w-4 mr-2" /> Go to Interview
                       </Button>
                     ) : (
-                      <p className="text-xs text-muted-foreground">Interview not yet scheduled</p>
+                      <p className="text-xs text-[#cbd5e1]">Interview not yet scheduled</p>
                     )}
                   </div>
                 )}
                 {!hasResume && !applied && (
-                  <p className="text-xs text-amber-600 flex items-center gap-1 justify-end">
+                  <p className="text-xs text-[#FCF1D0] flex items-center gap-1 justify-end">
                     <AlertCircle className="h-3 w-3" /> Upload resume first
                   </p>
                 )}
@@ -325,19 +325,18 @@ export default function JobDetailPage() {
                     <CardTitle className="flex items-center gap-2 text-lg">
                       <FileText className="h-5 w-5 text-primary" /> Your Resume
                       {matchScore != null && (
-                        <Badge className={`ml-auto text-xs ${
-                          matchScore >= 70 ? "bg-green-500/10 text-green-600 border-green-500/20" :
-                          matchScore >= 50 ? "bg-yellow-500/10 text-yellow-600 border-yellow-500/20" :
-                          "bg-red-500/10 text-red-600 border-red-500/20"
-                        }`}>
-                          <Sparkles className="h-3 w-3 mr-1" /> {matchScore}% Match
+                        <Badge className="ml-auto text-xs bg-[#FCF1D0] text-[#010736] font-bold border-0">
+                          <CheckCircle2 className="h-3 w-3 mr-1" /> {matchScore}% Match
                         </Badge>
                       )}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
                     {resumeData.name && (
-                      <p className="text-sm font-medium">👤 {resumeData.name}</p>
+                      <p className="text-sm font-medium flex items-center gap-1.5">
+                        <User className="h-3.5 w-3.5 text-muted-foreground" />
+                        {resumeData.name}
+                      </p>
                     )}
                     {resumeData.skills && resumeData.skills.length > 0 && (
                       <div>
@@ -348,7 +347,7 @@ export default function JobDetailPage() {
                               (rs) => rs.toLowerCase().includes(s.toLowerCase()) || s.toLowerCase().includes(rs.toLowerCase())
                             );
                             return (
-                              <Badge key={i} variant="outline" className={`text-[10px] ${isMatch ? "bg-green-500/10 text-green-600 border-green-500/30" : ""}`}>
+                              <Badge key={i} variant="outline" className={`text-[10px] ${isMatch ? "bg-[#22396F] text-[#FCF1D0] border-0" : ""}`}>
                                 {isMatch && <CheckCircle2 className="h-2.5 w-2.5 mr-0.5" />}{s}
                               </Badge>
                             );
@@ -360,8 +359,9 @@ export default function JobDetailPage() {
                       <div>
                         <p className="text-xs text-muted-foreground mb-1">Experience</p>
                         {resumeData.experience.slice(0, 3).map((exp, i) => (
-                          <p key={i} className="text-xs text-foreground">
-                            💼 {exp.position} at {exp.company}
+                          <p key={i} className="text-xs text-foreground flex items-center gap-1.5">
+                            <Briefcase className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                            <span>{exp.position} at {exp.company}</span>
                           </p>
                         ))}
                       </div>
@@ -370,8 +370,9 @@ export default function JobDetailPage() {
                       <div>
                         <p className="text-xs text-muted-foreground mb-1">Education</p>
                         {resumeData.education.slice(0, 2).map((edu, i) => (
-                          <p key={i} className="text-xs text-foreground">
-                            🎓 {edu.degree} — {edu.institution}
+                          <p key={i} className="text-xs text-foreground flex items-center gap-1.5">
+                            <GraduationCap className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                            <span>{edu.degree} — {edu.institution}</span>
                           </p>
                         ))}
                       </div>

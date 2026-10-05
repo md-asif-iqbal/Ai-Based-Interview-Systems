@@ -1,7 +1,21 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { AlertTriangle, ShieldAlert, X, Timer } from "lucide-react";
+import {
+  AlertTriangle,
+  ShieldAlert,
+  X,
+  Timer,
+  Search,
+  Monitor,
+  User,
+  Users,
+  ClipboardList,
+  MousePointer,
+  Wrench,
+  Camera,
+  type LucideIcon,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface ViolationWarningModalProps {
@@ -12,51 +26,51 @@ interface ViolationWarningModalProps {
   onDismiss: () => void;
 }
 
-const violationMessages: Record<string, { title: string; message: string; icon: string }> = {
+const violationMessages: Record<string, { title: string; message: string; icon: LucideIcon }> = {
   tab_switch: {
     title: "Tab Switch Detected",
     message: "You switched to another tab. This has been recorded as a violation. Please stay on the interview tab.",
-    icon: "⚠️",
+    icon: AlertTriangle,
   },
   window_blur: {
     title: "Window Focus Lost",
     message: "You clicked outside the interview window. Please keep focus on the interview.",
-    icon: "🔍",
+    icon: Search,
   },
   fullscreen_exit: {
     title: "Fullscreen Exit Detected",
     message: "You exited fullscreen mode. Fullscreen will be re-enabled automatically.",
-    icon: "🖥️",
+    icon: Monitor,
   },
   no_face: {
     title: "Face Not Detected",
     message: "Your face is not visible in the camera. Please ensure you are properly positioned.",
-    icon: "👤",
+    icon: User,
   },
   multiple_faces: {
     title: "Multiple Faces Detected",
     message: "Multiple people were detected in the frame. Please ensure you are alone.",
-    icon: "👥",
+    icon: Users,
   },
   copy_paste: {
     title: "Copy/Paste Blocked",
     message: "Copy and paste actions are not allowed during the interview.",
-    icon: "📋",
+    icon: ClipboardList,
   },
   right_click: {
     title: "Right-Click Blocked",
     message: "Right-click is disabled during the interview.",
-    icon: "🖱️",
+    icon: MousePointer,
   },
   dev_tools: {
     title: "Developer Tools Detected",
     message: "Opening developer tools is a serious violation. This may lead to interview termination.",
-    icon: "🔧",
+    icon: Wrench,
   },
   screenshot: {
     title: "Screenshot Attempt",
     message: "Taking screenshots during the interview is not allowed.",
-    icon: "📸",
+    icon: Camera,
   },
 };
 
@@ -70,7 +84,7 @@ export default function ViolationWarningModal({
   const config = violationMessages[type] || {
     title: "Security Violation",
     message: "An unauthorized action was detected.",
-    icon: "⚠️",
+    icon: AlertTriangle,
   };
 
   const remaining = maxWarnings - warningCount;
@@ -162,14 +176,15 @@ export default function ViolationWarningModal({
               </div>
 
               {isCritical && (
-                <p className="text-xs text-red-500 text-center mb-4 font-medium">
-                  ⚠️ Your interview may be terminated if violations continue
+                <p className="text-xs text-red-500 text-center mb-4 font-medium flex items-center justify-center gap-1.5">
+                  <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
+                  <span>Your interview may be terminated if violations continue</span>
                 </p>
               )}
 
               <Button
                 onClick={onDismiss}
-                className="w-full bg-linear-to-r from-primary to-accent hover:opacity-90"
+                className="w-full bg-[#FCF1D0] text-[#010736] hover:bg-[#f5e6b8] font-semibold transition-colors"
               >
                 I Understand, Continue
               </Button>

@@ -8,7 +8,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { signInWithPopup } from "firebase/auth";
 import { auth, googleProvider } from "@/lib/firebase/config";
-import { Brain, Eye, EyeOff, Loader2, Mail, Lock, User, Phone } from "lucide-react";
+import Image from "next/image";
+import { Eye, EyeOff, Loader2, Mail, Lock, User, Phone, Briefcase } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -68,7 +69,7 @@ export default function SignupPage() {
     return s;
   };
   const strength = getPasswordStrength(password);
-  const strengthColors = ["bg-red-500", "bg-orange-500", "bg-yellow-500", "bg-lime-500", "bg-green-500"];
+  const strengthColors = ["bg-[#22396F]/40", "bg-[#22396F]/60", "bg-[#22396F]", "bg-[#FCF1D0]/80", "bg-[#FCF1D0]"];
   const strengthLabels = ["Very Weak", "Weak", "Fair", "Strong", "Very Strong"];
 
   const onSubmit = async (data: SignupForm) => {
@@ -136,26 +137,34 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center py-12 px-4">
-      <div className="absolute inset-0 -z-10">
-        <div className="absolute top-20 left-1/4 w-125 h-125 bg-linear-to-br from-primary/10 to-transparent rounded-full blur-3xl" />
-        <div className="absolute bottom-20 right-1/4 w-100 h-100 bg-linear-to-tl from-accent/10 to-transparent rounded-full blur-3xl" />
-      </div>
-
-      <Card className="w-full max-w-lg border-border/40 shadow-2xl shadow-primary/5">
+    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center py-12 px-4 bg-[#f8fafc] dark:bg-[#010736] text-[#010736] dark:text-white transition-colors duration-200">
+      <Card className="w-full max-w-lg border-[#cbd5e1] dark:border-[#22396F] bg-white dark:bg-[#0D1C42] text-[#010736] dark:text-white shadow-xl">
         <CardHeader className="text-center pb-2 pt-8">
           <Link href="/" className="inline-flex items-center gap-2 justify-center mb-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-linear-to-br from-primary to-accent text-primary-foreground shadow-lg shadow-primary/25">
-              <Brain className="h-5 w-5" />
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white dark:bg-[#010736] border border-[#cbd5e1] dark:border-[#22396F] p-1.5 shadow-sm">
+              <Image
+                src="/logo-icon.png"
+                alt="InterviewIQ Logo"
+                width={36}
+                height={36}
+                className="h-9 w-9 object-contain dark:hidden"
+              />
+              <Image
+                src="/logo-icon-dark.png"
+                alt="InterviewIQ Logo"
+                width={36}
+                height={36}
+                className="h-9 w-9 object-contain hidden dark:block"
+              />
             </div>
           </Link>
-          <h1 className="text-2xl font-bold">Create your account</h1>
-          <p className="text-sm text-muted-foreground mt-1">Start your AI-powered interview journey</p>
+          <h1 className="text-2xl font-bold text-[#010736] dark:text-white">Create your account</h1>
+          <p className="text-sm text-[#64748b] dark:text-[#cbd5e1] mt-1">Start your AI-powered interview journey</p>
         </CardHeader>
         <CardContent className="px-6 pb-8 pt-4">
-          {/* Role Selection — shared between Google and email signup */}
+          {/* Role Selection */}
           <div className="space-y-2 mb-5">
-            <Label className="text-sm font-medium">I am a</Label>
+            <Label className="text-sm font-medium text-[#010736] dark:text-white">I am a</Label>
             <RadioGroup
               value={selectedRole}
               onValueChange={handleRoleChange}
@@ -164,8 +173,8 @@ export default function SignupPage() {
               <label
                 className={`flex items-center justify-center gap-2 rounded-xl border-2 p-3 cursor-pointer transition-all text-sm font-medium ${
                   selectedRole === "candidate"
-                    ? "border-primary bg-primary/5 text-primary"
-                    : "border-border hover:border-primary/40"
+                    ? "border-[#010736] bg-[#010736] text-[#FCF1D0] dark:border-[#FCF1D0] dark:bg-[#22396F] dark:text-[#FCF1D0]"
+                    : "border-[#cbd5e1] bg-white text-[#475569] hover:border-[#22396F] dark:border-[#22396F] dark:bg-[#010736] dark:text-[#cbd5e1] dark:hover:border-[#FCF1D0]"
                 }`}
               >
                 <RadioGroupItem value="candidate" className="sr-only" />
@@ -175,12 +184,12 @@ export default function SignupPage() {
               <label
                 className={`flex items-center justify-center gap-2 rounded-xl border-2 p-3 cursor-pointer transition-all text-sm font-medium ${
                   selectedRole === "recruiter"
-                    ? "border-primary bg-primary/5 text-primary"
-                    : "border-border hover:border-primary/40"
+                    ? "border-[#010736] bg-[#010736] text-[#FCF1D0] dark:border-[#FCF1D0] dark:bg-[#22396F] dark:text-[#FCF1D0]"
+                    : "border-[#cbd5e1] bg-white text-[#475569] hover:border-[#22396F] dark:border-[#22396F] dark:bg-[#010736] dark:text-[#cbd5e1] dark:hover:border-[#FCF1D0]"
                 }`}
               >
                 <RadioGroupItem value="recruiter" className="sr-only" />
-                <Brain className="h-4 w-4" />
+                <Briefcase className="h-4 w-4" />
                 Recruiter
               </label>
             </RadioGroup>
@@ -192,7 +201,7 @@ export default function SignupPage() {
             variant="outline"
             disabled={googleLoading}
             onClick={handleGoogleSignUp}
-            className="w-full h-11 gap-3 mb-4 border-border hover:bg-muted/50 transition-all"
+            className="w-full h-11 gap-3 mb-4 border-[#cbd5e1] dark:border-[#22396F] bg-white dark:bg-[#010736] text-[#010736] dark:text-white hover:bg-[#f1f5f9] dark:hover:bg-[#22396F] hover:text-[#010736] dark:hover:text-[#FCF1D0] transition-all"
           >
             {googleLoading ? (
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -209,56 +218,72 @@ export default function SignupPage() {
 
           <div className="relative my-5">
             <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-border" />
+              <span className="w-full border-t border-[#cbd5e1] dark:border-[#22396F]" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-card px-2 text-muted-foreground">or sign up with email</span>
+              <span className="bg-white dark:bg-[#0D1C42] px-3 text-[#64748b] dark:text-[#cbd5e1]">or sign up with email</span>
             </div>
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             {/* Full Name */}
             <div className="space-y-1.5">
-              <Label htmlFor="fullName">Full Name</Label>
+              <Label htmlFor="fullName" className="text-[#010736] dark:text-white">Full Name</Label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input id="fullName" placeholder="John Doe" className="pl-10" {...register("fullName")} />
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#64748b] dark:text-[#cbd5e1]" />
+                <Input
+                  id="fullName"
+                  placeholder="John Doe"
+                  className="pl-10 bg-white dark:bg-[#010736] border-[#cbd5e1] dark:border-[#22396F] text-[#010736] dark:text-white placeholder:text-[#94a3b8] focus:border-[#22396F] dark:focus:border-[#FCF1D0]"
+                  {...register("fullName")}
+                />
               </div>
-              {errors.fullName && <p className="text-xs text-destructive">{errors.fullName.message}</p>}
+              {errors.fullName && <p className="text-xs text-red-500">{errors.fullName.message}</p>}
             </div>
 
             {/* Email */}
             <div className="space-y-1.5">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="text-[#010736] dark:text-white">Email Address</Label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input id="email" type="email" placeholder="john@example.com" className="pl-10" {...register("email")} />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#64748b] dark:text-[#cbd5e1]" />
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="name@example.com"
+                  className="pl-10 bg-white dark:bg-[#010736] border-[#cbd5e1] dark:border-[#22396F] text-[#010736] dark:text-white placeholder:text-[#94a3b8] focus:border-[#22396F] dark:focus:border-[#FCF1D0]"
+                  {...register("email")}
+                />
               </div>
-              {errors.email && <p className="text-xs text-destructive">{errors.email.message}</p>}
+              {errors.email && <p className="text-xs text-red-500">{errors.email.message}</p>}
             </div>
 
             {/* Phone */}
             <div className="space-y-1.5">
-              <Label htmlFor="phone">Phone (Optional)</Label>
+              <Label htmlFor="phone" className="text-[#010736] dark:text-white">Phone (Optional)</Label>
               <div className="relative">
-                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input id="phone" placeholder="+1 (555) 000-0000" className="pl-10" {...register("phone")} />
+                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#64748b] dark:text-[#cbd5e1]" />
+                <Input
+                  id="phone"
+                  placeholder="+1 (555) 000-0000"
+                  className="pl-10 bg-white dark:bg-[#010736] border-[#cbd5e1] dark:border-[#22396F] text-[#010736] dark:text-white placeholder:text-[#94a3b8] focus:border-[#22396F] dark:focus:border-[#FCF1D0]"
+                  {...register("phone")}
+                />
               </div>
             </div>
 
             {/* Password */}
             <div className="space-y-1.5">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password" className="text-[#010736] dark:text-white">Password</Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#64748b] dark:text-[#cbd5e1]" />
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
-                  className="pl-10 pr-10"
+                  className="pl-10 pr-10 bg-white dark:bg-[#010736] border-[#cbd5e1] dark:border-[#22396F] text-[#010736] dark:text-white placeholder:text-[#94a3b8] focus:border-[#22396F] dark:focus:border-[#FCF1D0]"
                   {...register("password")}
                 />
-                <button type="button" className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground" onClick={() => setShowPassword(!showPassword)}>
+                <button type="button" className="absolute right-3 top-1/2 -translate-y-1/2 text-[#64748b] dark:text-[#cbd5e1] hover:text-[#010736] dark:hover:text-[#FCF1D0]" onClick={() => setShowPassword(!showPassword)}>
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
@@ -266,44 +291,44 @@ export default function SignupPage() {
                 <div className="space-y-1">
                   <div className="flex gap-1">
                     {[...Array(5)].map((_, i) => (
-                      <div key={i} className={`h-1.5 flex-1 rounded-full ${i < strength ? strengthColors[strength - 1] : "bg-muted"}`} />
+                      <div key={i} className={`h-1.5 flex-1 rounded-full ${i < strength ? strengthColors[strength - 1] : "bg-[#cbd5e1] dark:bg-[#22396F]"}`} />
                     ))}
                   </div>
-                  <p className="text-xs text-muted-foreground">{strengthLabels[strength - 1] || "Too short"}</p>
+                  <p className="text-xs text-[#64748b] dark:text-[#cbd5e1]">{strengthLabels[strength - 1] || "Too short"}</p>
                 </div>
               )}
-              {errors.password && <p className="text-xs text-destructive">{errors.password.message}</p>}
+              {errors.password && <p className="text-xs text-red-500">{errors.password.message}</p>}
             </div>
 
             {/* Confirm Password */}
             <div className="space-y-1.5">
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Label htmlFor="confirmPassword" className="text-[#010736] dark:text-white">Confirm Password</Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#64748b] dark:text-[#cbd5e1]" />
                 <Input
                   id="confirmPassword"
                   type="password"
                   placeholder="••••••••"
-                  className="pl-10"
+                  className="pl-10 bg-white dark:bg-[#010736] border-[#cbd5e1] dark:border-[#22396F] text-[#010736] dark:text-white placeholder:text-[#94a3b8] focus:border-[#22396F] dark:focus:border-[#FCF1D0]"
                   {...register("confirmPassword")}
                 />
               </div>
-              {errors.confirmPassword && <p className="text-xs text-destructive">{errors.confirmPassword.message}</p>}
+              {errors.confirmPassword && <p className="text-xs text-red-500">{errors.confirmPassword.message}</p>}
             </div>
 
             <Button
               type="submit"
               disabled={loading}
-              className="w-full h-11 bg-linear-to-r from-primary to-accent hover:opacity-90 shadow-lg shadow-primary/25 mt-2"
+              className="w-full h-11 bg-[#010736] text-[#FCF1D0] hover:bg-[#22396F] dark:bg-[#FCF1D0] dark:text-[#010736] dark:hover:bg-white font-semibold transition-all shadow-md mt-2"
             >
               {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
               {loading ? "Creating Account..." : "Create Account"}
             </Button>
           </form>
 
-          <p className="text-center text-sm text-muted-foreground mt-6">
+          <p className="text-center text-sm text-[#64748b] dark:text-[#cbd5e1] mt-6">
             Already have an account?{" "}
-            <Link href="/login" className="text-primary font-medium hover:underline">
+            <Link href="/login" className="text-[#010736] dark:text-[#FCF1D0] font-semibold hover:underline">
               Log In
             </Link>
           </p>

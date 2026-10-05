@@ -85,7 +85,7 @@ export default function JobsPage() {
       if (n >= 1000) return `${(n / 1000).toFixed(0)}K`;
       return String(n);
     };
-    const sym = sal.currency === "BDT" ? "৳" : sal.currency === "EUR" ? "€" : "$";
+    const sym = sal.currency === "BDT" ? "BDT " : sal.currency === "EUR" ? "€" : sal.currency === "GBP" ? "£" : "$";
     return `${sym}${fmt(sal.min)} - ${fmt(sal.max)}`;
   };
 
@@ -100,20 +100,20 @@ export default function JobsPage() {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-white dark:bg-[#010736] text-[#010736] dark:text-white transition-colors duration-200">
       {/* Hero Search */}
-      <section className="relative bg-linear-to-br from-primary/5 via-background to-accent/5 border-b">
+      <section className="relative bg-[#f8fafc] dark:bg-[#0D1C42] border-b border-[#cbd5e1] dark:border-[#22396F]">
         <div className="mx-auto max-w-7xl px-4 py-12 sm:py-16">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="text-center mb-8"
           >
-            <h1 className="text-3xl sm:text-4xl font-bold mb-3">
-              Find Your <span className="bg-linear-to-r from-primary to-accent bg-clip-text text-transparent">Dream Job</span>
+            <h1 className="text-3xl sm:text-4xl font-bold mb-3 text-[#010736] dark:text-white">
+              Find Your <span className="text-[#22396F] dark:text-[#FCF1D0]">Dream Job</span>
             </h1>
-            <p className="text-muted-foreground max-w-xl mx-auto">
-              AI-powered matching connects you with the best opportunities
+            <p className="text-[#475569] dark:text-[#cbd5e1] max-w-xl mx-auto">
+              AI-powered matching connects you with the best career opportunities
             </p>
           </motion.div>
 
@@ -126,10 +126,10 @@ export default function JobsPage() {
           >
             <div className="flex flex-col sm:flex-row gap-3 mb-4">
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#475569] dark:text-[#cbd5e1]" />
                 <Input
                   placeholder="Search by title, skill, or keyword..."
-                  className="pl-10 h-11"
+                  className="pl-10 h-11 bg-white dark:bg-[#010736] border-[#cbd5e1] dark:border-[#22396F] text-[#010736] dark:text-white placeholder:text-[#94a3b8] focus:border-[#22396F] dark:focus:border-[#FCF1D0]"
                   value={search}
                   onChange={(e) => {
                     setSearch(e.target.value);
@@ -139,21 +139,21 @@ export default function JobsPage() {
               </div>
               <Button
                 onClick={() => fetchJobs()}
-                className="h-11 bg-linear-to-r from-primary to-accent hover:opacity-90 shadow-lg shadow-primary/20"
+                className="h-11 bg-[#010736] text-[#FCF1D0] hover:bg-[#22396F] dark:bg-[#FCF1D0] dark:text-[#010736] dark:hover:bg-white font-semibold shadow-md"
               >
                 <Search className="h-4 w-4 mr-2" /> Search
               </Button>
             </div>
 
             <div className="flex flex-wrap gap-3 items-center">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <div className="flex items-center gap-2 text-sm text-[#475569] dark:text-[#cbd5e1]">
                 <Filter className="h-4 w-4" /> Filters:
               </div>
               <Select value={typeFilter} onValueChange={(v) => { setTypeFilter(v); setPage(1); }}>
-                <SelectTrigger className="w-37.5 h-9">
+                <SelectTrigger className="w-37.5 h-9 bg-white dark:bg-[#010736] border-[#cbd5e1] dark:border-[#22396F]">
                   <SelectValue placeholder="Job Type" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white dark:bg-[#0D1C42] border-[#cbd5e1] dark:border-[#22396F]">
                   <SelectItem value="all">All Types</SelectItem>
                   <SelectItem value="full-time">Full-time</SelectItem>
                   <SelectItem value="part-time">Part-time</SelectItem>
@@ -163,10 +163,10 @@ export default function JobsPage() {
                 </SelectContent>
               </Select>
               <Select value={levelFilter} onValueChange={(v) => { setLevelFilter(v); setPage(1); }}>
-                <SelectTrigger className="w-40 h-9">
+                <SelectTrigger className="w-40 h-9 bg-white dark:bg-[#010736] border-[#cbd5e1] dark:border-[#22396F]">
                   <SelectValue placeholder="Experience" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white dark:bg-[#0D1C42] border-[#cbd5e1] dark:border-[#22396F]">
                   <SelectItem value="all">All Levels</SelectItem>
                   <SelectItem value="entry">Entry Level</SelectItem>
                   <SelectItem value="mid">Mid Level</SelectItem>
@@ -174,7 +174,7 @@ export default function JobsPage() {
                   <SelectItem value="lead">Lead</SelectItem>
                 </SelectContent>
               </Select>
-              <Badge variant="secondary" className="text-xs">
+              <Badge variant="outline" className="text-xs bg-[#f1f5f9] dark:bg-[#0D1C42] border-[#cbd5e1] dark:border-[#22396F] text-[#010736] dark:text-[#FCF1D0]">
                 {total} jobs found
               </Badge>
             </div>
@@ -186,13 +186,13 @@ export default function JobsPage() {
       <section className="mx-auto max-w-7xl px-4 py-8">
         {loading ? (
           <div className="flex items-center justify-center py-20">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <Loader2 className="h-8 w-8 animate-spin text-[#010736] dark:text-[#FCF1D0]" />
           </div>
         ) : jobs.length === 0 ? (
           <div className="text-center py-20">
-            <Briefcase className="h-16 w-16 mx-auto text-muted-foreground/30 mb-4" />
-            <h3 className="text-lg font-semibold mb-1">No jobs found</h3>
-            <p className="text-muted-foreground text-sm">Try adjusting your search or filters</p>
+            <Briefcase className="h-16 w-16 mx-auto text-[#94a3b8] mb-4" />
+            <h3 className="text-lg font-semibold mb-1 text-[#010736] dark:text-white">No jobs found</h3>
+            <p className="text-[#475569] dark:text-[#cbd5e1] text-sm">Try adjusting your search or filters</p>
           </div>
         ) : (
           <>
@@ -205,43 +205,43 @@ export default function JobsPage() {
                   transition={{ delay: i * 0.04 }}
                 >
                   <Link href={`/jobs/${job._id}`}>
-                    <Card className="h-full border-border/40 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all group cursor-pointer">
+                    <Card className="h-full border-[#cbd5e1] dark:border-[#22396F] bg-white dark:bg-[#0D1C42] hover:border-[#22396F] dark:hover:border-[#FCF1D0] hover:shadow-md transition-all group cursor-pointer">
                       <CardHeader className="pb-3">
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex-1 min-w-0">
-                            <CardTitle className="text-base font-semibold line-clamp-1 group-hover:text-primary transition-colors">
+                            <CardTitle className="text-base font-semibold line-clamp-1 text-[#010736] dark:text-white group-hover:text-[#22396F] dark:group-hover:text-[#FCF1D0] transition-colors">
                               {job.title}
                             </CardTitle>
-                            <div className="flex items-center gap-1.5 mt-1 text-sm text-muted-foreground">
+                            <div className="flex items-center gap-1.5 mt-1 text-sm text-[#475569] dark:text-[#cbd5e1]">
                               <Building2 className="h-3.5 w-3.5 shrink-0" />
                               <span className="truncate">{job.companyId?.name || "Company"}</span>
                             </div>
                           </div>
                           <Badge
                             variant="secondary"
-                            className="shrink-0 text-[10px] capitalize"
+                            className="shrink-0 text-[10px] capitalize bg-[#f1f5f9] dark:bg-[#22396F] text-[#010736] dark:text-[#FCF1D0] border-0"
                           >
                             {job.employmentType?.replace("_", " ") || "Full Time"}
                           </Badge>
                         </div>
                       </CardHeader>
                       <CardContent className="pt-0 space-y-3">
-                        <p className="text-sm text-muted-foreground line-clamp-2">{job.description}</p>
+                        <p className="text-sm text-[#475569] dark:text-[#cbd5e1] line-clamp-2">{job.description}</p>
 
                         <div className="flex flex-wrap gap-1.5">
                           {(job.requirements?.skills || []).slice(0, 4).map((s) => (
-                            <Badge key={s} variant="outline" className="text-[10px] font-normal">
+                            <Badge key={s} variant="outline" className="text-[10px] font-normal border-[#cbd5e1] dark:border-[#22396F] text-[#010736] dark:text-[#FCF1D0]">
                               {s}
                             </Badge>
                           ))}
                           {(job.requirements?.skills || []).length > 4 && (
-                            <Badge variant="outline" className="text-[10px] font-normal text-muted-foreground">
+                            <Badge variant="outline" className="text-[10px] font-normal border-[#cbd5e1] dark:border-[#22396F] text-[#475569] dark:text-[#cbd5e1]">
                               +{(job.requirements?.skills || []).length - 4}
                             </Badge>
                           )}
                         </div>
 
-                        <div className="flex items-center justify-between text-xs text-muted-foreground pt-1 border-t border-border/50">
+                        <div className="flex items-center justify-between text-xs text-[#475569] dark:text-[#cbd5e1] pt-2 border-t border-[#cbd5e1] dark:border-[#22396F]/50">
                           <div className="flex items-center gap-3">
                             <span className="flex items-center gap-1">
                               <MapPin className="h-3 w-3" /> {job.location}

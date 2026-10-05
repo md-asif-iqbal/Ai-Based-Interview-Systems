@@ -108,7 +108,7 @@ export default function ProfilePage() {
     .slice(0, 2);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-accent/3">
+    <div className="min-h-screen bg-white dark:bg-[#010736] text-[#010736] dark:text-white transition-colors duration-200">
       <div className="mx-auto max-w-2xl px-4 py-8">
         {/* Back button */}
         <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
@@ -116,7 +116,7 @@ export default function ProfilePage() {
             variant="ghost"
             size="sm"
             onClick={() => router.back()}
-            className="mb-6 gap-2"
+            className="mb-6 gap-2 text-[#64748b] hover:text-[#010736] dark:text-[#cbd5e1] dark:hover:text-[#FCF1D0] hover:bg-[#f1f5f9] dark:hover:bg-[#0D1C42]"
           >
             <ArrowLeft className="h-4 w-4" /> Back
           </Button>
@@ -128,42 +128,32 @@ export default function ProfilePage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-          <Card className="mb-6 overflow-hidden border-border/40">
-            <div className="h-24 sm:h-32 bg-gradient-to-r from-primary/15 via-accent/10 to-purple-500/15 relative">
-              <motion.div
-                className="absolute inset-0"
-                style={{
-                  background:
-                    "radial-gradient(circle at 30% 50%, hsl(var(--primary) / 0.1) 0%, transparent 50%)",
-                }}
-                animate={{ opacity: [0.5, 1, 0.5] }}
-                transition={{ duration: 4, repeat: Infinity }}
-              />
-            </div>
+          <Card className="mb-6 overflow-hidden border-[#cbd5e1] dark:border-[#22396F] bg-white dark:bg-[#0D1C42] text-[#010736] dark:text-white shadow-sm">
+            <div className="h-24 sm:h-32 bg-[#010736] dark:bg-[#22396F] relative" />
             <CardContent className="pt-0 pb-6 px-6">
               <div className="flex flex-col sm:flex-row items-center sm:items-end gap-4 -mt-12 sm:-mt-10">
                 <div className="relative">
-                  <Avatar className="h-24 w-24 border-4 border-background shadow-xl">
+                  <Avatar className="h-24 w-24 border-4 border-white dark:border-[#0D1C42] shadow-xl">
                     {user.profilePicture ? (
                       <AvatarImage src={user.profilePicture} alt={user.fullName} />
                     ) : null}
-                    <AvatarFallback className="bg-gradient-to-br from-primary to-accent text-white text-2xl font-bold">
+                    <AvatarFallback className="bg-[#010736] dark:bg-[#22396F] text-[#FCF1D0] text-2xl font-bold">
                       {initials}
                     </AvatarFallback>
                   </Avatar>
-                  <div className="absolute -bottom-1 -right-1 h-7 w-7 rounded-full bg-background border-2 border-border flex items-center justify-center">
-                    <Camera className="h-3.5 w-3.5 text-muted-foreground" />
+                  <div className="absolute -bottom-1 -right-1 h-7 w-7 rounded-full bg-[#f8fafc] dark:bg-[#010736] border-2 border-[#cbd5e1] dark:border-[#22396F] flex items-center justify-center">
+                    <Camera className="h-3.5 w-3.5 text-[#010736] dark:text-[#FCF1D0]" />
                   </div>
                 </div>
                 <div className="text-center sm:text-left flex-1 pb-1">
-                  <h1 className="text-xl sm:text-2xl font-bold">{user.fullName}</h1>
-                  <p className="text-sm text-muted-foreground">{user.email}</p>
+                  <h1 className="text-xl sm:text-2xl font-bold text-[#010736] dark:text-white">{user.fullName}</h1>
+                  <p className="text-sm text-[#64748b] dark:text-[#cbd5e1]">{user.email}</p>
                   <div className="flex items-center justify-center sm:justify-start gap-2 mt-2">
-                    <Badge className="capitalize bg-primary/10 text-primary border-primary/20">
+                    <Badge className="capitalize bg-[#010736] dark:bg-[#22396F] text-[#FCF1D0] border-0">
                       <Briefcase className="h-3 w-3 mr-1" />
                       {user.role}
                     </Badge>
-                    <Badge variant="outline" className="text-green-600 border-green-500/30">
+                    <Badge variant="outline" className="text-emerald-600 dark:text-emerald-400 border-emerald-500/30">
                       <CheckCircle2 className="h-3 w-3 mr-1" /> Active
                     </Badge>
                   </div>
@@ -172,7 +162,7 @@ export default function ProfilePage() {
                   variant="outline"
                   size="sm"
                   onClick={() => setEditing(!editing)}
-                  className="gap-2 shrink-0"
+                  className="gap-2 shrink-0 border-[#cbd5e1] dark:border-[#22396F] bg-white dark:bg-[#010736] text-[#010736] dark:text-white hover:bg-[#f1f5f9] dark:hover:bg-[#22396F] dark:hover:text-[#FCF1D0]"
                 >
                   <Pencil className="h-3.5 w-3.5" />
                   {editing ? "Cancel" : "Edit Profile"}
@@ -188,10 +178,10 @@ export default function ProfilePage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
-          <Card className="border-border/40">
+          <Card className="border-[#cbd5e1] dark:border-[#22396F] bg-white dark:bg-[#0D1C42] text-[#010736] dark:text-white shadow-sm">
             <CardHeader>
-              <CardTitle className="text-base flex items-center gap-2">
-                <User className="h-4 w-4 text-primary" />
+              <CardTitle className="text-base flex items-center gap-2 text-[#010736] dark:text-white">
+                <User className="h-4 w-4 text-[#010736] dark:text-[#FCF1D0]" />
                 {editing ? "Edit Profile" : "Profile Details"}
               </CardTitle>
             </CardHeader>
@@ -199,41 +189,43 @@ export default function ProfilePage() {
               {editing ? (
                 <>
                   <div className="space-y-2">
-                    <Label htmlFor="fullName">Full Name</Label>
+                    <Label htmlFor="fullName" className="text-[#010736] dark:text-white">Full Name</Label>
                     <Input
                       id="fullName"
                       value={form.fullName}
                       onChange={(e) => setForm({ ...form, fullName: e.target.value })}
                       placeholder="Enter your full name"
+                      className="bg-white dark:bg-[#010736] border-[#cbd5e1] dark:border-[#22396F] text-[#010736] dark:text-white placeholder:text-[#94a3b8] focus:border-[#22396F] dark:focus:border-[#FCF1D0]"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="email">Email Address</Label>
+                    <Label htmlFor="email" className="text-[#010736] dark:text-white">Email Address</Label>
                     <Input
                       id="email"
                       value={user.email}
                       disabled
-                      className="bg-muted/50"
+                      className="bg-[#f1f5f9] dark:bg-[#010736]/60 border-[#cbd5e1] dark:border-[#22396F] text-[#64748b] dark:text-[#cbd5e1]"
                     />
-                    <p className="text-xs text-muted-foreground">Email cannot be changed</p>
+                    <p className="text-xs text-[#64748b] dark:text-[#cbd5e1]">Email cannot be changed</p>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="phone">Phone Number</Label>
+                    <Label htmlFor="phone" className="text-[#010736] dark:text-white">Phone Number</Label>
                     <Input
                       id="phone"
                       value={form.phone}
                       onChange={(e) => setForm({ ...form, phone: e.target.value })}
                       placeholder="+1 (555) 000-0000"
+                      className="bg-white dark:bg-[#010736] border-[#cbd5e1] dark:border-[#22396F] text-[#010736] dark:text-white placeholder:text-[#94a3b8] focus:border-[#22396F] dark:focus:border-[#FCF1D0]"
                     />
                   </div>
                   <div className="flex justify-end gap-3 pt-3">
-                    <Button variant="outline" onClick={() => setEditing(false)}>
+                    <Button variant="outline" className="border-[#cbd5e1] dark:border-[#22396F] bg-white dark:bg-[#010736] text-[#010736] dark:text-white hover:bg-[#f1f5f9] dark:hover:bg-[#22396F]" onClick={() => setEditing(false)}>
                       Cancel
                     </Button>
                     <Button
                       onClick={handleSave}
                       disabled={saving}
-                      className="bg-gradient-to-r from-primary to-accent hover:opacity-90 gap-2"
+                      className="bg-[#010736] text-[#FCF1D0] hover:bg-[#22396F] dark:bg-[#FCF1D0] dark:text-[#010736] dark:hover:bg-white font-semibold gap-2 shadow-sm"
                     >
                       {saving ? (
                         <Loader2 className="h-4 w-4 animate-spin" />
@@ -257,14 +249,14 @@ export default function ProfilePage() {
                       initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 0.3 + i * 0.05 }}
-                      className="flex items-center gap-4 p-3 rounded-lg hover:bg-muted/30 transition-colors"
+                      className="flex items-center gap-4 p-3 rounded-lg hover:bg-[#f1f5f9] dark:hover:bg-[#22396F]/30 transition-colors"
                     >
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 shrink-0">
-                        <item.icon className="h-4 w-4 text-primary" />
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#f1f5f9] dark:bg-[#22396F] text-[#010736] dark:text-[#FCF1D0] border border-[#cbd5e1] dark:border-[#22396F] shrink-0">
+                        <item.icon className="h-4 w-4" />
                       </div>
                       <div className="min-w-0">
-                        <p className="text-xs text-muted-foreground">{item.label}</p>
-                        <p className={`text-sm font-medium truncate ${item.capitalize ? "capitalize" : ""}`}>
+                        <p className="text-xs text-[#64748b] dark:text-[#cbd5e1]">{item.label}</p>
+                        <p className={`text-sm font-medium truncate text-[#010736] dark:text-white ${item.capitalize ? "capitalize" : ""}`}>
                           {item.value}
                         </p>
                       </div>
@@ -285,30 +277,30 @@ export default function ProfilePage() {
         >
           <Button
             variant="outline"
-            className="justify-start gap-3 h-auto py-4 px-4"
+            className="justify-start gap-3 h-auto py-4 px-4 border-[#cbd5e1] dark:border-[#22396F] bg-white dark:bg-[#0D1C42] text-[#010736] dark:text-white hover:bg-[#f1f5f9] dark:hover:bg-[#22396F]"
             onClick={() =>
               router.push(user.role === "recruiter" ? "/recruiter/dashboard" : "/dashboard")
             }
           >
-            <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-              <Briefcase className="h-4 w-4 text-primary" />
+            <div className="h-8 w-8 rounded-lg bg-[#f1f5f9] dark:bg-[#010736] border border-[#cbd5e1] dark:border-[#22396F] flex items-center justify-center shrink-0 text-[#010736] dark:text-[#FCF1D0]">
+              <Briefcase className="h-4 w-4" />
             </div>
             <div className="text-left">
               <p className="text-sm font-medium">Dashboard</p>
-              <p className="text-xs text-muted-foreground">View your activity</p>
+              <p className="text-xs text-[#64748b] dark:text-[#cbd5e1]">View your activity</p>
             </div>
           </Button>
           <Button
             variant="outline"
-            className="justify-start gap-3 h-auto py-4 px-4"
+            className="justify-start gap-3 h-auto py-4 px-4 border-[#cbd5e1] dark:border-[#22396F] bg-white dark:bg-[#0D1C42] text-[#010736] dark:text-white hover:bg-[#f1f5f9] dark:hover:bg-[#22396F]"
             onClick={() => router.push("/jobs")}
           >
-            <div className="h-8 w-8 rounded-lg bg-accent/10 flex items-center justify-center shrink-0">
-              <Briefcase className="h-4 w-4 text-accent" />
+            <div className="h-8 w-8 rounded-lg bg-[#f1f5f9] dark:bg-[#010736] border border-[#cbd5e1] dark:border-[#22396F] flex items-center justify-center shrink-0 text-[#010736] dark:text-[#FCF1D0]">
+              <Briefcase className="h-4 w-4" />
             </div>
             <div className="text-left">
               <p className="text-sm font-medium">Browse Jobs</p>
-              <p className="text-xs text-muted-foreground">Find opportunities</p>
+              <p className="text-xs text-[#64748b] dark:text-[#cbd5e1]">Find opportunities</p>
             </div>
           </Button>
         </motion.div>

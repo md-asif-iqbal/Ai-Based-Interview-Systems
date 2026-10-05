@@ -48,10 +48,10 @@ const violationIcons: Record<string, React.ReactNode> = {
 };
 
 const severityConfig: Record<string, { color: string; bg: string; border: string }> = {
-  low: { color: "text-yellow-600", bg: "bg-yellow-500/10", border: "border-yellow-500/20" },
-  medium: { color: "text-orange-600", bg: "bg-orange-500/10", border: "border-orange-500/20" },
-  high: { color: "text-red-500", bg: "bg-red-500/10", border: "border-red-500/20" },
-  critical: { color: "text-red-700 dark:text-red-400", bg: "bg-red-500/15", border: "border-red-500/30" },
+  low: { color: "text-[#FCF1D0]", bg: "bg-[#22396F]", border: "border-0" },
+  medium: { color: "text-white", bg: "bg-[#0D1C42]", border: "border-[#22396F]" },
+  high: { color: "text-[#FCF1D0]", bg: "bg-[#010736]", border: "border-[#22396F]" },
+  critical: { color: "text-white", bg: "bg-[#010736]", border: "border-[#22396F]" },
 };
 
 export default function SecurityReportViewer({
@@ -90,20 +90,16 @@ export default function SecurityReportViewer({
       {/* Score Overview */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
         <Card className={`border-border/40 overflow-hidden ${wasTerminated ? "border-red-500/30" : ""}`}>
-          <div className={`p-6 ${wasTerminated ? "bg-red-500/5" : "bg-linear-to-r from-primary/5 to-accent/5"}`}>
+          <div className={`p-6 ${wasTerminated ? "bg-red-500/10" : "bg-[#0D1C42] border-b border-[#22396F]"}`}>
             <div className="flex flex-col sm:flex-row sm:items-center gap-6">
               <div className="relative">
-                <div className={`flex h-24 w-24 items-center justify-center rounded-full border-4 ${
-                  securityScore >= 80 ? "border-green-500/30" :
-                  securityScore >= 60 ? "border-yellow-500/30" :
-                  "border-red-500/30"
-                }`}>
+                <div className="flex h-24 w-24 items-center justify-center rounded-full border-4 border-[#22396F] bg-[#010736]">
                   {wasTerminated ? (
-                    <ShieldAlert className="h-10 w-10 text-red-500" />
+                    <ShieldAlert className="h-10 w-10 text-white" />
                   ) : securityScore >= 80 ? (
-                    <ShieldCheck className="h-10 w-10 text-green-500" />
+                    <ShieldCheck className="h-10 w-10 text-[#FCF1D0]" />
                   ) : (
-                    <Shield className={`h-10 w-10 ${scoreColor}`} />
+                    <Shield className="h-10 w-10 text-[#FCF1D0]" />
                   )}
                 </div>
               </div>
@@ -148,10 +144,10 @@ export default function SecurityReportViewer({
       >
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
-            { label: "Critical", count: severityCounts.critical, color: "text-red-600", bg: "bg-red-500/10" },
-            { label: "High", count: severityCounts.high, color: "text-orange-500", bg: "bg-orange-500/10" },
-            { label: "Medium", count: severityCounts.medium, color: "text-yellow-600", bg: "bg-yellow-500/10" },
-            { label: "Low", count: severityCounts.low, color: "text-blue-500", bg: "bg-blue-500/10" },
+            { label: "Critical", count: severityCounts.critical, color: "text-white", bg: "bg-[#010736]" },
+            { label: "High", count: severityCounts.high, color: "text-[#FCF1D0]", bg: "bg-[#0D1C42]" },
+            { label: "Medium", count: severityCounts.medium, color: "text-white", bg: "bg-[#0D1C42]" },
+            { label: "Low", count: severityCounts.low, color: "text-[#FCF1D0]", bg: "bg-[#22396F]" },
           ].map((s) => (
             <Card key={s.label} className="border-border/40">
               <CardContent className="p-4 text-center">
