@@ -210,7 +210,7 @@ npm run dev
 
 - **Frontend**: Next.js 16, React 19, TypeScript, Tailwind CSS
 - **Backend**: Node.js, MongoDB, Mongoose
-- **AI**: Google Gemini (gemini-1.5-flash)
+- **AI**: Google Gemini (gemini-3.8-flash)
 - **Auth**: JWT with httpOnly cookies
 - **UI**: shadcn/ui components
 - **State**: Zustand

@@ -3,8 +3,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { writeFile, mkdir } from "fs/promises";
 import { existsSync } from "fs";
 import path from "path";
-
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
+import { getResolvedModelName } from "@/lib/gemini/client";
 
 export async function POST(req: Request) {
   try {
@@ -54,9 +53,18 @@ export async function POST(req: Request) {
       );
     }
 
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      return NextResponse.json(
+        { success: false, error: "GEMINI_API_KEY is not defined in environment variables" },
+        { status: 500 }
+      );
+    }
+
     // Use Gemini AI to parse the resume
+    const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({ 
-      model: process.env.GEMINI_MODEL || "gemini-2.5-flash" 
+      model: getResolvedModelName() 
     });
 
     const prompt = `

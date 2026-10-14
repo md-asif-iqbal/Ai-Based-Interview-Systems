@@ -590,7 +590,7 @@ export default function RecruiterDashboard() {
                         const jobTitle = interview.applicationId?.jobId?.title || "Position";
                         const score = interview.overallScore || 0;
                         const rec = interview.aiRecommendation;
-                        const recConfig: Record<string, { label: string; color: string; bg: string; icon: any }> = {
+                        const recConfig: Record<string, { label: string; color: string; bg: string; icon: React.ComponentType<{ className?: string }> }> = {
                           strong_hire: { label: "Strong Hire", color: "text-[#010736]", bg: "bg-[#FCF1D0] font-bold", icon: Award },
                           hire: { label: "Hire", color: "text-[#FCF1D0]", bg: "bg-[#22396F]", icon: CheckCircle2 },
                           maybe: { label: "Maybe", color: "text-white", bg: "bg-[#0D1C42] border border-[#22396F]", icon: HelpCircle },

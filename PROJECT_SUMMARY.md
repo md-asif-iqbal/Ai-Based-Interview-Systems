@@ -11,7 +11,7 @@ Built from a comprehensive 55-prompt specification, SoftLanding is a production-
 ### Complete Full-Stack Application
 - **Frontend**: Next.js 16 with React 19, TypeScript strict mode, Tailwind CSS v4
 - **Backend**: MongoDB with Mongoose, JWT authentication, 20+ API routes
-- **AI Integration**: Google Gemini AI (gemini-1.5-flash) for 5 core features
+- **AI Integration**: Google Gemini AI (gemini-3.8-flash) for 5 core features
 - **Security**: Advanced interview proctoring with 8 real-time monitoring hooks
 - **UI**: 22+ shadcn/ui components with custom cyan/teal/purple theme
 

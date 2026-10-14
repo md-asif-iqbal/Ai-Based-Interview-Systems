@@ -45,7 +45,7 @@ A comprehensive, next-generation interview platform powered by Google Gemini AI 
 ### Backend
 - **MongoDB** with Mongoose ODM
 - **JWT Authentication** with httpOnly cookies
-- **Google Gemini AI** (gemini-1.5-flash)
+- **Google Gemini AI** (gemini-3.8-flash)
 - **Node.js** runtime
 - **bcryptjs** - Password hashing
 

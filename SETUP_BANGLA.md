@@ -60,7 +60,7 @@ MONGODB_URI=mongodb+srv://admin:Admin@123456@naasmind-cluster.xxxxx.mongodb.net/
 GEMINI_API_KEY=AIzaSyXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 # এগুলো এমনই থাকবে
-GEMINI_MODEL=gemini-1.5-flash
+GEMINI_MODEL=gemini-3.8-flash
 JWT_SECRET=dev_secret_key_change_in_production_12345
 JWT_EXPIRES_IN=7d
 NEXT_PUBLIC_APP_URL=http://localhost:3000

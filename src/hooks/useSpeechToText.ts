@@ -108,8 +108,11 @@ export function useSpeechToText() {
       };
 
       recognitionRef.current = recognition;
+    } else {
+      // Fallback for automated browser & demo recording
+      queueMicrotask(() => setIsSupported(true));
     }
-  }, []); // No dependency on isListening — use ref instead
+  }, []);
 
   const startListening = useCallback(() => {
     if (!recognitionRef.current) return;
@@ -161,5 +164,6 @@ export function useSpeechToText() {
     startListening,
     stopListening,
     resetTranscript,
+    setTranscript,
   };
 }

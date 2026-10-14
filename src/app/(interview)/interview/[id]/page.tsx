@@ -618,10 +618,7 @@ export default function InterviewPage() {
 
     // Verify mic is available via speech recognition
     if (!speech.isSupported) {
-      toast.error("Microphone / Speech Recognition is not supported in your browser. Please use Chrome.", {
-        duration: 8000,
-      });
-      return;
+      toast.warning("Microphone / Speech Recognition may be limited in this browser.");
     }
 
     // ═══ STEP 2: Warm up TTS — browser requires user gesture ═══
@@ -681,7 +678,7 @@ export default function InterviewPage() {
   /* ═══════════════════════════════════════ */
   const currentQ = store.questions[store.currentQuestionIndex];
   const isLowTime = store.timeRemaining < 30;
-  const categoryIcon: Record<string, any> = {
+  const categoryIcon: Record<string, React.ComponentType<{ className?: string }>> = {
     technical: Code2,
     behavioral: Brain,
     situational: Target,

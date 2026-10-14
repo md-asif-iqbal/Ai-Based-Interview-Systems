@@ -119,7 +119,7 @@ Resume Summary:
     // Generate AI interview questions based on job and resume
     console.log('🤖 Generating 15 AI questions based on job position and resume...');
     
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+    const model = genAI.getGenerativeModel({ model: process.env.GEMINI_MODEL || "gemini-3.8-flash" });
     
     const prompt = `
 You are an expert international-standard technical interviewer conducting a professional AI interview. Generate exactly 15 comprehensive interview questions for this job position and candidate.

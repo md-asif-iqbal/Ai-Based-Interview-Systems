@@ -1,35 +1,47 @@
 import { GoogleGenerativeAI, GenerativeModel } from "@google/generative-ai";
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY!;
-const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+const DEPRECATED_MODELS = new Set([
+  "gemini-2.5-flash",
+  "gemini-1.5-flash",
+  "gemini-1.5-pro",
+  "gemini-2.0-flash",
+  "gemini-2.0-flash-exp",
+]);
+
+export const DEFAULT_GEMINI_MODEL = "gemini-3.8-flash";
+
+export function getResolvedModelName(): string {
+  const envModel = process.env.GEMINI_MODEL?.trim();
+  if (!envModel || DEPRECATED_MODELS.has(envModel)) {
+    return DEFAULT_GEMINI_MODEL;
+  }
+  return envModel;
+}
 
 let genAIInstance: GoogleGenerativeAI | null = null;
-let modelInstance: GenerativeModel | null = null;
 
 function getGenAI(): GoogleGenerativeAI {
-  if (!GEMINI_API_KEY) {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
     throw new Error("GEMINI_API_KEY is not defined in environment variables");
   }
   if (!genAIInstance) {
-    genAIInstance = new GoogleGenerativeAI(GEMINI_API_KEY);
+    genAIInstance = new GoogleGenerativeAI(apiKey);
   }
   return genAIInstance;
 }
 
 export function getGeminiModel(): GenerativeModel {
-  if (!modelInstance) {
-    const genAI = getGenAI();
-    modelInstance = genAI.getGenerativeModel({
-      model: GEMINI_MODEL,
-      generationConfig: {
-        temperature: 0.7,
-        topP: 0.8,
-        topK: 40,
-        maxOutputTokens: 8192,
-      },
-    });
-  }
-  return modelInstance;
+  const genAI = getGenAI();
+  return genAI.getGenerativeModel({
+    model: getResolvedModelName(),
+    generationConfig: {
+      temperature: 0.7,
+      topP: 0.8,
+      topK: 40,
+      maxOutputTokens: 8192,
+    },
+  });
 }
 
 export async function generateContent(prompt: string): Promise<string> {
@@ -43,7 +55,7 @@ export async function generateContent(prompt: string): Promise<string> {
     return result;
   } catch (error) {
     console.error("Gemini API error:", error);
-    throw new Error("Failed to generate content from Gemini API");
+    throw new Error(error instanceof Error ? error.message : "Failed to generate content from Gemini API");
   }
 }
 
@@ -51,7 +63,7 @@ export async function generateContent(prompt: string): Promise<string> {
 export async function generateContentCreative(prompt: string, temperature = 1.2): Promise<string> {
   const genAI = getGenAI();
   const model = genAI.getGenerativeModel({
-    model: GEMINI_MODEL,
+    model: getResolvedModelName(),
     generationConfig: {
       temperature,   // higher = more varied questions per interview
       topP: 0.95,
@@ -68,7 +80,7 @@ export async function generateContentCreative(prompt: string, temperature = 1.2)
     return result;
   } catch (error) {
     console.error("Gemini creative API error:", error);
-    throw new Error("Failed to generate content from Gemini API");
+    throw new Error(error instanceof Error ? error.message : "Failed to generate content from Gemini API");
   }
 }
 

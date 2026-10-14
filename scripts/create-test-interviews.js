@@ -5,7 +5,7 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 const MONGODB_URI = "mongodb+srv://asifnaasmind_db_user:H8yd9uzKzfmnfF0Y@cluster0.krmw4r6.mongodb.net/naasmind?retryWrites=true&w=majority&appName=Cluster0";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const geminiModel = genAI.getGenerativeModel({ model: process.env.GEMINI_MODEL || 'gemini-2.5-flash' });
+const geminiModel = genAI.getGenerativeModel({ model: process.env.GEMINI_MODEL || 'gemini-3.8-flash' });
 
 const COMPANIES = [
   { name: "TechNova Solutions", logo: "🚀" },

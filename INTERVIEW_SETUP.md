@@ -6,7 +6,7 @@
 - Questions personalized based on:
   - Candidate's resume (skills, experience, projects)
   - Job requirements (title, description, required skills)
-- Generated using Gemini AI (gemini-2.5-flash)
+- Generated using Gemini AI (gemini-3.8-flash)
 - Distribution:
   - 4 Technical questions (job-specific)
   - 2 Behavioral questions
@@ -154,7 +154,7 @@ Progress: [■■□□□□□□□□] 1/10
    - Voice control integration
 
 ### Configuration
-- **Gemini Model**: `gemini-2.5-flash`
+- **Gemini Model**: `gemini-3.8-flash`
 - **API Key**: Set in environment
 - **Database**: MongoDB Atlas (naasmind)
 - **Time Limits**:
@@ -198,7 +198,7 @@ Based on resume analysis + job requirements:
 ## ✅ Success Checklist
 
 - [x] PDF parsing with full resume extraction
-- [x] Gemini AI integration (gemini-2.5-flash)
+- [x] Gemini AI integration (gemini-3.8-flash)
 - [x] 10 AI-powered personalized questions
 - [x] 20 minutes per question (1200 seconds)
 - [x] 1 minute preparation time

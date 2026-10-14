@@ -210,7 +210,7 @@ RESEND_API_KEY=
 ```env
 MONGODB_URI=mongodb+srv://...
 GEMINI_API_KEY=AIzaSy...
-GEMINI_MODEL=gemini-1.5-flash
+GEMINI_MODEL=gemini-3.8-flash
 JWT_SECRET=vrgp+1iHds28/rKMjQUwAjRzdTSc8Z8UOhDp83rQigo=
 JWT_EXPIRES_IN=7d
 R2_ACCOUNT_ID=
@@ -227,7 +227,7 @@ NODE_ENV=development
 ```env
 MONGODB_URI=mongodb+srv://...
 GEMINI_API_KEY=AIzaSy...
-GEMINI_MODEL=gemini-1.5-flash
+GEMINI_MODEL=gemini-3.8-flash
 JWT_SECRET=vrgp+1iHds28/rKMjQUwAjRzdTSc8Z8UOhDp83rQigo=
 JWT_EXPIRES_IN=7d
 R2_ACCOUNT_ID=xxxxxxxxxxxxx
