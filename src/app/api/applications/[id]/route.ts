@@ -57,7 +57,7 @@ export async function PUT(
 
     const validStatuses = [
       "applied", "screening", "interview_scheduled", "interviewed",
-      "under_review", "offer", "rejected", "withdrawn",
+      "under_review", "final_interview", "offer", "rejected", "withdrawn",
     ];
 
     if (!validStatuses.includes(status)) {

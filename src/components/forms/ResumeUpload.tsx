@@ -17,6 +17,7 @@ export default function ResumeUpload({ onUploadComplete }: ResumeUploadProps) {
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [status, setStatus] = useState<"idle" | "uploading" | "parsing" | "done" | "error">("idle");
+  const [uploadStep, setUploadStep] = useState("Preparing document...");
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     const f = acceptedFiles[0];
@@ -56,31 +57,39 @@ export default function ResumeUpload({ onUploadComplete }: ResumeUploadProps) {
     setUploading(true);
     setStatus("uploading");
     setProgress(0);
+    setUploadStep("Reading document & verifying format...");
 
-    // Simulate progress
+    let current = 0;
     const interval = setInterval(() => {
-      setProgress((p) => {
-        if (p >= 40) {
-          clearInterval(interval);
-          return 40;
-        }
-        return p + 5;
-      });
-    }, 200);
+      let increment = 1;
+      if (current < 25) {
+        increment = 2;
+        setUploadStep("Uploading resume document...");
+      } else if (current < 55) {
+        increment = 1.2;
+        setStatus("parsing");
+        setUploadStep("Extracting text and verifying structure...");
+      } else if (current < 80) {
+        increment = 0.8;
+        setUploadStep("AI parsing skills, experience, and education...");
+      } else if (current < 92) {
+        increment = 0.3;
+        setUploadStep("Calculating profile readiness score...");
+      } else {
+        increment = 0;
+      }
+      current = Math.min(94, current + increment);
+      setProgress(Math.round(current));
+    }, 60);
 
     try {
       const formData = new FormData();
       formData.append("resume", file);
 
-      setProgress(50);
-      setStatus("parsing");
-
       const res = await fetch("/api/resume/upload", {
         method: "POST",
         body: formData,
       });
-
-      clearInterval(interval);
 
       if (!res.ok) {
         const data = await res.json();
@@ -88,6 +97,8 @@ export default function ResumeUpload({ onUploadComplete }: ResumeUploadProps) {
       }
 
       const data = await res.json();
+      clearInterval(interval);
+      setUploadStep("Analysis complete!");
       setProgress(100);
       setStatus("done");
       toast.success("Resume parsed successfully!");
@@ -95,6 +106,7 @@ export default function ResumeUpload({ onUploadComplete }: ResumeUploadProps) {
     } catch (err) {
       clearInterval(interval);
       setStatus("error");
+      setProgress(0);
       toast.error(err instanceof Error ? err.message : "Upload failed");
     } finally {
       setUploading(false);
@@ -197,11 +209,14 @@ export default function ResumeUpload({ onUploadComplete }: ResumeUploadProps) {
             exit={{ opacity: 0, height: 0 }}
             className="space-y-2"
           >
-            <Progress value={progress} className="h-2" />
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <Loader2 className="h-3 w-3 animate-spin" />
-              {status === "uploading" ? "Uploading resume..." : "AI is analyzing your resume..."}
+            <div className="flex justify-between items-center text-xs text-muted-foreground font-medium">
+              <span className="flex items-center gap-1.5">
+                <Loader2 className="h-3 w-3 animate-spin text-primary" />
+                {uploadStep}
+              </span>
+              <span className="font-semibold">{progress}%</span>
             </div>
+            <Progress value={progress} className="h-2 transition-all duration-150" />
           </motion.div>
         )}
       </AnimatePresence>

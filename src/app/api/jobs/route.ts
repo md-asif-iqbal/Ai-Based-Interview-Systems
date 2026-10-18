@@ -68,6 +68,8 @@ export async function GET(req: NextRequest) {
   }
 }
 
+import Company from "@/models/Company";
+
 export async function POST(req: NextRequest) {
   try {
     const authUser = await getAuthUserFromRequest(req);
@@ -78,9 +80,75 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const body = await req.json();
-    const parsed = createJobSchema.safeParse(body);
+    await connectDB();
+    const rawBody = await req.json();
 
+    // 1. Resolve or auto-create companyId if not provided
+    let companyId = rawBody.companyId;
+    if (!companyId) {
+      let company = await Company.findOne({ ownerId: authUser.userId });
+      if (!company) {
+        company = await Company.create({
+          name: rawBody.companyName || "Tech Innovations Ltd.",
+          industry: rawBody.industry || "Software & Technology",
+          location: rawBody.location || "Remote",
+          ownerId: authUser.userId,
+        });
+      }
+      companyId = company._id.toString();
+    }
+
+    // 2. Normalize employmentType ("full-time" -> "full_time")
+    let employmentType = rawBody.employmentType || rawBody.type || "full_time";
+    employmentType = employmentType.replace("-", "_");
+    if (!["full_time", "part_time", "contract", "internship"].includes(employmentType)) {
+      employmentType = "full_time";
+    }
+
+    // 3. Normalize requirements
+    let requirements = rawBody.requirements;
+    if (!requirements || typeof requirements !== "object" || !Array.isArray(requirements.skills)) {
+      const skillsArray = Array.isArray(rawBody.skills)
+        ? rawBody.skills
+        : typeof rawBody.skills === "string"
+        ? rawBody.skills.split(",").map((s: string) => s.trim()).filter(Boolean)
+        : ["General Software Engineering"];
+      requirements = {
+        skills: skillsArray.length > 0 ? skillsArray : ["General Engineering"],
+        experienceYears: Number(rawBody.experienceYears || (rawBody.experienceLevel === "senior" ? 5 : rawBody.experienceLevel === "lead" ? 8 : 2)),
+        education: rawBody.education || "Bachelor's degree or equivalent experience",
+      };
+    }
+
+    // 4. Normalize salary range
+    let salaryRange = rawBody.salaryRange || rawBody.salary;
+    if (salaryRange && (salaryRange.min != null || salaryRange.max != null)) {
+      salaryRange = {
+        min: Number(salaryRange.min || 0),
+        max: Number(salaryRange.max || salaryRange.min || 0),
+        currency: salaryRange.currency || "BDT",
+      };
+    }
+
+    const isRemote = Boolean(
+      rawBody.remote ||
+      (typeof rawBody.location === "string" && rawBody.location.toLowerCase().includes("remote"))
+    );
+
+    const normalizedBody = {
+      title: rawBody.title,
+      description: rawBody.description,
+      companyId,
+      department: rawBody.department || "Engineering",
+      location: rawBody.location || "Remote",
+      remote: isRemote,
+      employmentType,
+      requirements,
+      salaryRange,
+      benefits: Array.isArray(rawBody.benefits) ? rawBody.benefits : [],
+    };
+
+    const parsed = createJobSchema.safeParse(normalizedBody);
     if (!parsed.success) {
       return NextResponse.json(
         { success: false, error: parsed.error.issues[0].message },
@@ -88,12 +156,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    await connectDB();
-
     const job = await JobPosting.create({
       ...parsed.data,
       createdBy: authUser.userId,
-      status: "active",
+      status: rawBody.status === "draft" ? "draft" : "active",
     });
 
     return NextResponse.json(

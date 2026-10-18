@@ -3,12 +3,11 @@
 import { useState, useCallback } from "react";
 import Link from "next/link";
 import { useDropzone } from "react-dropzone";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   Upload,
   FileText,
   CheckCircle2,
-  AlertCircle,
   Loader2,
   Briefcase,
   GraduationCap,
@@ -149,6 +148,7 @@ export default function ResumeParserPage() {
   const [file, setFile] = useState<File | null>(null);
   const [parsing, setParsing] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [parsingStep, setParsingStep] = useState("Preparing document...");
   const [parsedResult, setParsedResult] = useState<ParsedData | null>(null);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
@@ -179,20 +179,43 @@ export default function ResumeParserPage() {
     if (!file) return;
 
     setParsing(true);
-    setProgress(15);
+    setProgress(0);
+    setParsingStep("Reading document & verifying format...");
+
+    let currentProgress = 0;
+    const interval = setInterval(() => {
+      let increment = 1;
+      if (currentProgress < 25) {
+        increment = 2;
+        setParsingStep("Reading document & verifying format...");
+      } else if (currentProgress < 50) {
+        increment = 1.2;
+        setParsingStep("Extracting text, sections & formatting...");
+      } else if (currentProgress < 75) {
+        increment = 0.8;
+        setParsingStep("AI analyzing skills, experience & education...");
+      } else if (currentProgress < 90) {
+        increment = 0.4;
+        setParsingStep("Calculating candidate readiness score & match metrics...");
+      } else if (currentProgress < 95) {
+        increment = 0.15;
+        setParsingStep("Finalizing structured profile...");
+      } else {
+        increment = 0;
+      }
+
+      currentProgress = Math.min(95, currentProgress + increment);
+      setProgress(Math.round(currentProgress));
+    }, 60);
 
     try {
       const formData = new FormData();
       formData.append("file", file);
 
-      setProgress(40);
-
       const res = await fetch("/api/parse-resume", {
         method: "POST",
         body: formData,
       });
-
-      setProgress(75);
 
       const result = await res.json();
 
@@ -200,10 +223,17 @@ export default function ResumeParserPage() {
         throw new Error(result.error || "Failed to parse resume");
       }
 
+      clearInterval(interval);
+      setParsingStep("Analysis complete!");
       setProgress(100);
+
+      // Brief pause so user sees smooth 100% completion
+      await new Promise((resolve) => setTimeout(resolve, 350));
       setParsedResult(result.data);
       toast.success("Resume parsed successfully with Gemini AI!");
     } catch (err: unknown) {
+      clearInterval(interval);
+      setProgress(0);
       const e = err as Error;
       toast.error(e.message || "Failed to parse resume. You can test with the sample resume button.");
     } finally {
@@ -282,12 +312,15 @@ export default function ResumeParserPage() {
 
                 {/* Progress Bar when uploading */}
                 {parsing && (
-                  <div className="mt-6 space-y-2">
-                    <div className="flex justify-between text-xs text-[#64748b] dark:text-[#cbd5e1] font-medium">
-                      <span>Analyzing resume with Gemini AI...</span>
-                      <span>{progress}%</span>
+                  <div className="mt-6 space-y-2 p-4 rounded-xl bg-[#f8fafc] dark:bg-[#0D1C42] border border-[#cbd5e1] dark:border-[#22396F]">
+                    <div className="flex justify-between text-xs text-[#334155] dark:text-[#cbd5e1] font-medium">
+                      <span className="flex items-center gap-1.5">
+                        <Loader2 className="h-3.5 w-3.5 animate-spin text-[#22396F] dark:text-[#FCF1D0]" />
+                        {parsingStep}
+                      </span>
+                      <span className="font-bold text-[#010736] dark:text-[#FCF1D0]">{progress}%</span>
                     </div>
-                    <Progress value={progress} className="h-2 [&>div]:bg-[#010736] dark:[&>div]:bg-[#FCF1D0]" />
+                    <Progress value={progress} className="h-2.5 transition-all duration-150 [&>div]:bg-[#010736] dark:[&>div]:bg-[#FCF1D0]" />
                   </div>
                 )}
 

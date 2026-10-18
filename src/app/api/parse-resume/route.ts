@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import { writeFile, mkdir } from "fs/promises";
 import { existsSync } from "fs";
 import path from "path";
-import { getResolvedModelName } from "@/lib/gemini/client";
+import { parseResumeWithGemini } from "@/lib/gemini/resumeParser";
 
 export async function POST(req: Request) {
   try {
@@ -37,11 +36,11 @@ export async function POST(req: Request) {
     try {
       const pdfData = await pdf(buffer);
       pdfText = pdfData.text;
-      console.log("[ResumeParser] PDF text extracted:", pdfText.substring(0, 200) + "...");
+      console.log("[ResumeParser] PDF text extracted, character count:", pdfText.length);
     } catch (error) {
       console.error("PDF parsing error:", error);
       return NextResponse.json(
-        { success: false, error: "Failed to parse PDF" },
+        { success: false, error: "Failed to parse PDF text" },
         { status: 500 }
       );
     }
@@ -53,91 +52,23 @@ export async function POST(req: Request) {
       );
     }
 
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-      return NextResponse.json(
-        { success: false, error: "GEMINI_API_KEY is not defined in environment variables" },
-        { status: 500 }
-      );
-    }
+    // Parse resume using Gemini with multi-model fallback and heuristic backup
+    const parsedData = await parseResumeWithGemini(pdfText);
 
-    // Use Gemini AI to parse the resume
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ 
-      model: getResolvedModelName() 
-    });
-
-    const prompt = `
-You are an expert resume parser. Extract ALL information from this resume text and return it as a complete JSON object. Extract EVERY detail you find.
-
-Resume Text:
-${pdfText}
-
-IMPORTANT INSTRUCTIONS:
-1. Extract EVERYTHING - don't skip any information
-2. For experience, include ALL work experience entries with FULL descriptions
-3. For education, include ALL education entries with complete details
-4. For skills, list EVERY skill mentioned (technical, soft skills, tools, frameworks, etc.)
-5. For certifications, list ALL certifications mentioned
-6. Extract projects if mentioned
-7. Extract achievements if mentioned
-8. Use null only if the field is truly not mentioned in the resume
-
-Please extract and return a JSON object with this COMPLETE structure:
-{
-  "fullName": "candidate's full name",
-  "email": "email address",
-  "phone": "phone number",
-  "location": "city, country/address",
-  "summary": "professional summary or objective - extract the complete text",
-  "skills": ["skill1", "skill2", "skill3", "...list ALL skills found"],
-  "experience": [
-    {
-      "position": "exact job title",
-      "company": "company name",
-      "duration": "start date - end date",
-      "description": "complete job description with all responsibilities and achievements"
-    }
-  ],
-  "education": [
-    {
-      "degree": "full degree name",
-      "institution": "complete institution name",
-      "year": "graduation year or duration",
-      "details": "additional details like GPA, honors, etc."
-    }
-  ],
-  "certifications": ["certification1", "certification2", "...all certifications"],
-  "languages": ["language1", "language2", "...all languages"],
-  "projects": ["project1 description", "project2 description", "...if any"],
-  "achievements": ["achievement1", "achievement2", "...if any"]
-}
-
-Return ONLY the JSON object, no additional text or explanation. Make sure to extract EVERY piece of information from the resume.`;
-
-    console.log("[ResumeParser] Sending to Gemini AI...");
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    let text = response.text();
-    
-    console.log("[ResumeParser] Raw Gemini response received");
-
-    // Clean the response - remove markdown code blocks if present
-    text = text.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
-
-    // Parse the JSON
-    let parsedData: Record<string, unknown>;
-    try {
-      parsedData = JSON.parse(text) as Record<string, unknown>;
-      console.log("[ResumeParser] Successfully parsed JSON structure");
-    } catch (parseError) {
-      console.error("JSON parse error:", parseError);
-      console.error("Failed text:", text);
-      return NextResponse.json(
-        { success: false, error: "AI response was not valid JSON" },
-        { status: 500 }
-      );
-    }
+    // Normalize output structure to satisfy both dashboard and public page
+    const formattedResult: Record<string, unknown> = {
+      ...parsedData,
+      fullName: parsedData.name,
+      experience: parsedData.experience.map((exp) => ({
+        ...exp,
+        position: exp.title,
+        duration: exp.endDate ? `${exp.startDate} - ${exp.endDate}` : `${exp.startDate} - Present`,
+      })),
+      education: parsedData.education.map((edu) => ({
+        ...edu,
+        details: edu.field || edu.gpa || "",
+      })),
+    };
 
     // Save the uploaded file (optional - for reference)
     try {
@@ -147,26 +78,23 @@ Return ONLY the JSON object, no additional text or explanation. Make sure to ext
       }
       
       const timestamp = Date.now();
-      const filename = `${timestamp}-${file.name}`;
+      const filename = `${timestamp}-${file.name.replace(/[^a-zA-Z0-9.-]/g, "_")}`;
       const filepath = path.join(uploadDir, filename);
       
       await writeFile(filepath, buffer);
-      console.log("[ResumeParser] File saved:", filepath);
-      
-      parsedData.uploadedFile = `/uploads/resumes/${filename}`;
+      formattedResult.uploadedFile = `/uploads/resumes/${filename}`;
     } catch (saveError) {
-      console.error("File save error:", saveError);
-      // Continue even if file save fails
+      console.error("File save error (non-fatal):", saveError);
     }
 
     return NextResponse.json({
       success: true,
-      data: parsedData,
+      data: formattedResult,
       message: "Resume parsed successfully",
     });
 
   } catch (error) {
-    console.error("Resume parsing error:", error);
+    console.error("Resume parsing route error:", error);
     return NextResponse.json(
       { 
         success: false, 

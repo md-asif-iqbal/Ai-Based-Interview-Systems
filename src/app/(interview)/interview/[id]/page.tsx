@@ -21,6 +21,9 @@ import {
   Code2,
   Target,
   FileText,
+  Languages,
+  EyeOff,
+  Radio,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -36,6 +39,7 @@ import { useTabSwitchDetection } from "@/hooks/useTabSwitchDetection";
 import { useViolationLogger } from "@/hooks/useViolationLogger";
 import ViolationWarningModal from "@/components/interview/ViolationWarningModal";
 import ScoreReaction from "@/components/interview/ScoreReaction";
+import { playTabSwitchWarningSound, playCameraFocusWarningSound } from "@/lib/audio/warningSound";
 
 const MAX_WARNINGS = 10;
 
@@ -130,18 +134,27 @@ export default function InterviewPage() {
   type Phase = "loading" | "ready" | "prep" | "intro" | "question" | "evaluating" | "completed" | "terminated";
   const [phase, setPhase] = useState<Phase>("loading");
   const [prepTime, setPrepTime] = useState(15);
-  const [warningModal, setWarningModal] = useState({ open: false, type: "" });
+  const [warningModal, setWarningModal] = useState({
+    open: false,
+    type: "",
+    penalty: 5,
+    isFirstWarning: false,
+    nextPenaltyMarks: 5,
+  });
   const [submitting, setSubmitting] = useState(false);
   const [aiSpeaking, setAiSpeaking] = useState(false);
   const [interviewDbStatus, setInterviewDbStatus] = useState("ready");
   const [evalProgress, setEvalProgress] = useState(0);
   const [faceWarning, setFaceWarning] = useState(false);
+  const [penaltyPoints, setPenaltyPoints] = useState(0);
 
   // Refs
   const questionTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const prepTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const autoSubmitRef = useRef(false);
   const sidebarVideoRef = useRef<HTMLVideoElement>(null);
+  const lastViolationTimeRef = useRef(0);
+  const violationCountRef = useRef(0);
 
   // Sync all video elements whenever stream becomes available OR phase changes
   useEffect(() => {
@@ -171,23 +184,65 @@ export default function InterviewPage() {
     prevFullscreenRef.current = fullscreen.isFullScreen;
   }, [fullscreen.isFullScreen, phase]);
 
-  /* ─── Violation handler ─── */
+  /* ─── Violation handler (Alarm Sound + Grace 1st Warning, Marks Deduction on Repeat) ─── */
   const handleViolation = useCallback(
-    (type: string) => {
+    (type: string, penalty: number = 5) => {
+      const now = Date.now();
+      // Cooldown to avoid duplicate triggers from simultaneously fired window events
+      if (now - lastViolationTimeRef.current < 1500) {
+        return;
+      }
+      lastViolationTimeRef.current = now;
+
+      violationCountRef.current += 1;
+      const isFirst = violationCountRef.current === 1;
+      const actualPenalty = isFirst ? 0 : penalty;
+
       violationLogger.logViolation(type);
       store.incrementWarning();
-      setWarningModal({ open: true, type });
+
+      if (!isFirst) {
+        setPenaltyPoints((p) => p + actualPenalty);
+      }
+
+      setWarningModal({
+        open: true,
+        type,
+        penalty: actualPenalty,
+        isFirstWarning: isFirst,
+        nextPenaltyMarks: penalty,
+      });
+
+      // Trigger audible warning alarm
+      if (type === "tab_switch" || type === "window_blur" || type === "fullscreen_exit") {
+        playTabSwitchWarningSound();
+      } else if (type === "looking_away" || type === "no_face") {
+        playCameraFocusWarningSound();
+      }
+
+      if (isFirst) {
+        toast.warning(
+          `⚠️ First Warning: No marks deducted! Stay focused — next violation will deduct -${penalty} marks.`,
+          { duration: 5500 }
+        );
+      } else {
+        toast.error(
+          `🚨 Security Alert: -${actualPenalty} marks deducted for ${type.replace("_", " ")}!`,
+          { duration: 4500 }
+        );
+      }
+
       if (violationLogger.totalScore <= 0 || store.warningCount >= MAX_WARNINGS) {
         setPhase("terminated");
-        toast.error("Interview terminated due to security violations.");
+        toast.error("Interview terminated due to excessive security violations.");
         fetch(`/api/interviews/${interviewId}/complete`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ terminated: true }),
+          body: JSON.stringify({ terminated: true, penaltyPoints: penaltyPoints + actualPenalty }),
         });
       }
     },
-    [violationLogger, store, interviewId]
+    [violationLogger, store, interviewId, penaltyPoints]
   );
 
   /* ═══════════════════════════════════════ */
@@ -225,11 +280,7 @@ export default function InterviewPage() {
         if (candidateName) store.setCandidateName(candidateName);
         if (companyName) store.setCompanyName(companyName);
 
-        const total = (interview.questions || []).reduce(
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          (a: number, _q: any) => a + 50,
-          0
-        );
+        const total = (interview.questions || []).length * 50;
         store.setTotalTimeRemaining(total);
 
         // Route to correct phase based on DB status
@@ -429,19 +480,50 @@ export default function InterviewPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase]);
 
+  /* ─── Camera Eye Contact & Face Visibility Monitoring ─── */
   useEffect(() => {
+    if (phase !== "question") return;
+
+    // Face missing from frame for ~4.5 seconds
     if (faceDetection.noFaceFrames >= 3) {
       setFaceWarning(true);
       if (faceDetection.noFaceFrames === 3) {
-        toast.warning("Face not detected! Please sit in front of the camera and look straight.", {
-          duration: 4000,
-          id: "face-warning",
-        });
+        handleViolation("no_face", 3);
       }
     } else {
       setFaceWarning(false);
     }
-  }, [faceDetection.noFaceFrames]);
+
+    // Looking away from camera for ~3 seconds
+    if (faceDetection.lookingAwayFrames === 2) {
+      handleViolation("looking_away", 2);
+    }
+  }, [faceDetection.noFaceFrames, faceDetection.lookingAwayFrames, phase, handleViolation]);
+
+  /* ─── Real-Time Tab Switch & Blur Audible Alarm Guard ─── */
+  useEffect(() => {
+    if (phase !== "question" && phase !== "prep" && phase !== "intro") return;
+
+    const onVisibilityChange = () => {
+      if (document.visibilityState === "hidden") {
+        playTabSwitchWarningSound();
+        handleViolation("tab_switch", 5);
+      }
+    };
+
+    const onBlur = () => {
+      playTabSwitchWarningSound();
+      handleViolation("window_blur", 5);
+    };
+
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    window.addEventListener("blur", onBlur);
+
+    return () => {
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+      window.removeEventListener("blur", onBlur);
+    };
+  }, [phase, handleViolation]);
 
   /* ─── Move to next question or complete ─── */
   const moveToNextOrComplete = useCallback(() => {
@@ -527,7 +609,7 @@ export default function InterviewPage() {
       const res = await fetch(`/api/interviews/${interviewId}/complete`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ terminated: false }),
+        body: JSON.stringify({ terminated: false, penaltyPoints }),
       });
       const json = await res.json();
 
@@ -1325,68 +1407,167 @@ export default function InterviewPage() {
                 </motion.div>
               </AnimatePresence>
 
-              {/* ─── Voice Answer Area (NO TEXT INPUT) ─── */}
-              <Card>
+              {/* ─── Ultra-Modern Voice-Only Answer Area (Text Input Forbidden) ─── */}
+              <Card className="border border-[#22396F]/30 bg-gradient-to-b from-card to-card/60 shadow-xl overflow-hidden relative">
+                <div className="h-1 w-full bg-gradient-to-r from-emerald-500 via-cyan-500 to-indigo-500" />
                 <CardContent className="p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-sm font-semibold flex items-center gap-2">
-                      <Mic className="h-4 w-4" /> Your Answer (Voice Only)
-                    </h3>
-                    <Button
-                      variant={speech.isListening ? "destructive" : "default"}
-                      size="sm"
-                      onClick={() => {
-                        if (speech.isListening) {
-                          speech.stopListening();
-                        } else {
-                          speech.startListening();
-                        }
-                      }}
-                      disabled={!speech.isSupported || aiSpeaking}
-                    >
-                      {speech.isListening ? (
-                        <>
-                          <MicOff className="h-4 w-4 mr-1" /> Pause Mic
-                        </>
-                      ) : (
-                        <>
-                          <Mic className="h-4 w-4 mr-1" /> Start Speaking
-                        </>
-                      )}
-                    </Button>
+                  <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <div className="flex items-center gap-2">
+                        <span className="relative flex h-3 w-3">
+                          {speech.isListening && (
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                          )}
+                          <span className={`relative inline-flex rounded-full h-3 w-3 ${speech.isListening ? "bg-emerald-500" : "bg-muted-foreground"}`} />
+                        </span>
+                        <h3 className="text-sm font-bold flex items-center gap-1.5 text-foreground">
+                          <Mic className="h-4 w-4 text-[#22396F] dark:text-[#FCF1D0]" /> Voice Response Mode
+                        </h3>
+                      </div>
+                      
+                      {/* Strictly Spoken Answers Badge */}
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-primary/10 text-primary border border-primary/20">
+                        🔒 Voice Only • No Keyboard
+                      </span>
+
+                      {/* Bilingual Language Selector */}
+                      <div className="flex items-center gap-1 bg-muted/60 p-0.5 rounded-lg border text-xs">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            speech.setLanguage("en-US");
+                            toast.info("Speech recognition language set to English (US)");
+                          }}
+                          className={`px-2.5 py-1 rounded-md font-medium transition-all ${
+                            speech.language === "en-US"
+                              ? "bg-white dark:bg-[#010736] text-[#010736] dark:text-[#FCF1D0] shadow-xs"
+                              : "text-muted-foreground hover:text-foreground"
+                          }`}
+                        >
+                          🇬🇧 English
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            speech.setLanguage("bn-BD");
+                            toast.info("Speech recognition language set to বাংলা (Bengali)");
+                          }}
+                          className={`px-2.5 py-1 rounded-md font-medium transition-all ${
+                            speech.language === "bn-BD"
+                              ? "bg-white dark:bg-[#010736] text-[#010736] dark:text-[#FCF1D0] shadow-xs"
+                              : "text-muted-foreground hover:text-foreground"
+                          }`}
+                        >
+                          🇧🇩 বাংলা
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant={speech.isListening ? "destructive" : "default"}
+                        size="sm"
+                        onClick={() => {
+                          if (speech.isListening) {
+                            speech.stopListening();
+                          } else {
+                            speech.startListening();
+                          }
+                        }}
+                        disabled={!speech.isSupported || aiSpeaking}
+                        className="font-semibold shadow-xs"
+                      >
+                        {speech.isListening ? (
+                          <>
+                            <MicOff className="h-4 w-4 mr-1.5" /> Pause Mic
+                          </>
+                        ) : (
+                          <>
+                            <Mic className="h-4 w-4 mr-1.5" /> Start Speaking
+                          </>
+                        )}
+                      </Button>
+                    </div>
                   </div>
 
-                  {/* Live recording indicator */}
+                  {/* Language guidance banner */}
+                  <div className="text-xs text-muted-foreground mb-4 flex items-center justify-between bg-muted/30 px-3.5 py-2 rounded-xl border border-border/40">
+                    <div className="flex items-center gap-2">
+                      <Languages className="h-4 w-4 text-[#22396F] dark:text-[#FCF1D0] shrink-0" />
+                      <span>
+                        {speech.language === "bn-BD"
+                          ? "বাংলায় সরাসরি কথা বলুন — কোনো কিবোর্ড টাইপিং অনুমোদন নেই, এআই নির্ভুলভাবে আপনার বক্তব্য শুনবে।"
+                          : "Voice-only proctored assessment. Speak naturally into your microphone; keyboard typing is disabled."}
+                      </span>
+                    </div>
+                    {speech.isListening && (
+                      <div className="flex items-center gap-1.5 shrink-0 text-emerald-600 dark:text-emerald-400 font-bold text-[11px]">
+                        <Radio className="h-3.5 w-3.5 animate-pulse" /> LIVE AUDIO
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Audio Reactive Speech Wave Visualizer */}
                   {speech.isListening && (
-                    <div className="flex items-center gap-2 mb-3 text-red-500 text-sm">
-                      <div className="h-3 w-3 bg-red-500 rounded-full animate-pulse" />
-                      Listening... Speak your answer now
+                    <div className="flex items-center justify-center gap-1.5 py-2 mb-3 bg-emerald-500/5 rounded-xl border border-emerald-500/20">
+                      {[40, 75, 100, 60, 90, 45, 80, 50, 95, 65, 35].map((h, i) => (
+                        <motion.div
+                          key={i}
+                          animate={{ height: [8, h * 0.28, 8] }}
+                          transition={{
+                            repeat: Infinity,
+                            duration: 0.8,
+                            delay: i * 0.08,
+                            ease: "easeInOut",
+                          }}
+                          className="w-1.5 rounded-full bg-emerald-500"
+                        />
+                      ))}
+                      <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 ml-2">
+                        {speech.language === "bn-BD" ? "শুনছি... ক্যামেরার দিকে তাকিয়ে কথা বলুন" : "Capturing speech... Look directly at the camera"}
+                      </span>
                     </div>
                   )}
 
-                  {/* Transcript display (read-only) */}
-                  <div className="min-h-[120px] rounded-lg border bg-muted/30 p-4 text-sm leading-relaxed">
+                  {/* Real-time Voice Transcript Display (Read-Only) */}
+                  <div className="min-h-[140px] rounded-2xl border border-border/60 bg-muted/20 p-4 text-sm leading-relaxed relative">
                     {speech.transcript ? (
-                      <p>{speech.transcript}</p>
+                      <div className="space-y-1">
+                        <p className="text-foreground font-medium text-base leading-relaxed tracking-wide">
+                          {speech.transcript}
+                        </p>
+                        {speech.interimTranscript && (
+                          <p className="text-primary/70 italic text-sm animate-pulse">
+                            {speech.interimTranscript} ...
+                          </p>
+                        )}
+                      </div>
                     ) : (
-                      <p className="text-muted-foreground italic">
-                        {aiSpeaking
-                          ? "Wait for AI to finish the question, then speak your answer..."
-                          : speech.isListening
-                          ? "Listening... your speech will appear here..."
-                          : "Click 'Start Speaking' to begin answering"}
-                      </p>
-                    )}
-                    {speech.interimTranscript && (
-                      <p className="text-muted-foreground/60 italic mt-1">
-                        {speech.interimTranscript}
-                      </p>
+                      <div className="h-full min-h-[100px] flex flex-col items-center justify-center text-center p-4">
+                        <div className="h-10 w-10 rounded-full bg-muted/60 flex items-center justify-center mb-2">
+                          <Mic className="h-5 w-5 text-muted-foreground" />
+                        </div>
+                        <p className="text-muted-foreground text-sm font-medium">
+                          {aiSpeaking
+                            ? "AI interviewer is speaking... Please wait before answering."
+                            : speech.isListening
+                            ? speech.language === "bn-BD"
+                              ? "আপনার উত্তর বলা শুরু করুন... আপনার ভয়েস এখানে স্বয়ংক্রিয়ভাবে টেক্সট হিসেবে আসবে।"
+                              : "Speak your answer into the microphone now..."
+                            : "Click 'Start Speaking' to begin your verbal response."}
+                        </p>
+                        <p className="text-[11px] text-muted-foreground/70 mt-1">
+                          No text input permitted. Answers must be submitted via voice.
+                        </p>
+                      </div>
                     )}
                   </div>
 
                   {/* Speech error */}
                   {speech.error && (
-                    <p className="text-xs text-red-500 mt-2">{speech.error}</p>
+                    <p className="text-xs text-red-500 mt-2 font-medium flex items-center gap-1">
+                      <AlertTriangle className="h-3.5 w-3.5" /> {speech.error}
+                    </p>
                   )}
 
                   <div className="flex items-center justify-between mt-4">
@@ -1442,10 +1623,10 @@ export default function InterviewPage() {
 
             {/* ─── RIGHT SIDEBAR ─── */}
             <div className="space-y-4">
-              {/* Camera */}
-              <Card className="overflow-hidden">
+              {/* Camera & Eye-Contact Proctoring Feed */}
+              <Card className="overflow-hidden border border-[#22396F]/30 shadow-lg">
                 <CardContent className="p-0">
-                  <div className="relative aspect-[4/3] bg-black">
+                  <div className="relative aspect-[4/3] bg-black overflow-hidden rounded-t-xl">
                     <video
                       ref={sidebarVideoRef}
                       autoPlay
@@ -1453,81 +1634,148 @@ export default function InterviewPage() {
                       playsInline
                       className="w-full h-full object-cover"
                     />
+
+                    {/* Camera Focus HUD / Gaze Alignment Badge */}
+                    <div className="absolute top-2 left-2 z-10">
+                      {faceDetection.lastResult.gazeStatus === "focused" ? (
+                        <div className="flex items-center gap-1.5 bg-emerald-600/90 backdrop-blur-md rounded-full px-2.5 py-1 text-[10px] text-white font-bold shadow-md">
+                          <Target className="h-3 w-3" /> Focus: Centered 🎯
+                        </div>
+                      ) : faceDetection.lastResult.gazeStatus === "looking_away" ? (
+                        <div className="flex items-center gap-1.5 bg-amber-500/95 backdrop-blur-md rounded-full px-2.5 py-1 text-[10px] text-black font-extrabold shadow-md animate-pulse">
+                          <EyeOff className="h-3 w-3" /> ⚠️ Look at Camera!
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-1.5 bg-red-600/90 backdrop-blur-md rounded-full px-2.5 py-1 text-[10px] text-white font-bold shadow-md animate-bounce">
+                          <AlertTriangle className="h-3 w-3" /> Face Missing
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Proctored Recording Badge */}
+                    <div className="absolute top-2 right-2 z-10 flex items-center gap-1.5 bg-red-600/90 backdrop-blur-md rounded-full px-2.5 py-1 text-[10px] text-white font-bold shadow-md">
+                      <div className="h-2 w-2 rounded-full bg-white animate-pulse" />
+                      <span>PROCTORED</span>
+                    </div>
+
+                    {/* Subtle Gaze Alignment Crosshair Guide */}
+                    <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+                      <div
+                        className={`h-28 w-28 rounded-full border border-dashed transition-all duration-300 ${
+                          faceDetection.lastResult.gazeStatus === "focused"
+                            ? "border-emerald-400/30 scale-100"
+                            : "border-amber-400/60 scale-105"
+                        }`}
+                      />
+                    </div>
+
                     {!video.hasPermission && (
                       <div className="absolute inset-0 flex items-center justify-center bg-muted">
                         <VideoOff className="h-8 w-8 text-muted-foreground" />
                       </div>
                     )}
+
+                    {/* Bottom Warning HUD */}
                     {faceWarning && (
-                      <div className="absolute inset-x-0 bottom-0 bg-red-500/80 text-white text-[10px] text-center py-1 flex items-center justify-center gap-1">
-                        <AlertTriangle className="h-3 w-3 shrink-0" />
-                        <span>Face not detected — sit upright &amp; face camera</span>
+                      <div className="absolute inset-x-0 bottom-0 bg-red-600/90 backdrop-blur-md text-white text-[10px] text-center py-1.5 flex items-center justify-center gap-1.5 font-bold z-10">
+                        <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
+                        <span>Face not detected — Sit upright &amp; look directly into camera</span>
                       </div>
                     )}
-                    {video.isRecording && (
-                      <div className="absolute top-2 right-2 flex items-center gap-1 bg-red-500/80 rounded-full px-2 py-0.5">
-                        <div className="h-2 w-2 rounded-full bg-white animate-pulse" />
-                        <span className="text-[10px] text-white font-medium">REC</span>
+                    {!faceWarning && faceDetection.lastResult.isLookingAway && (
+                      <div className="absolute inset-x-0 bottom-0 bg-amber-500/90 backdrop-blur-md text-black text-[10px] text-center py-1 flex items-center justify-center gap-1.5 font-bold z-10">
+                        <EyeOff className="h-3.5 w-3.5 shrink-0" />
+                        <span>Focus on the camera lens while answering</span>
                       </div>
                     )}
                   </div>
-                  <div className="p-2 flex items-center justify-between">
-                    <div className="flex items-center gap-1.5">
+
+                  <div className="p-2.5 bg-card flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-2">
                       <div
-                        className={`h-2 w-2 rounded-full ${
-                          video.hasPermission ? "bg-green-500" : "bg-red-500"
+                        className={`h-2.5 w-2.5 rounded-full ${
+                          video.hasPermission ? "bg-emerald-500 shadow-xs shadow-emerald-500/50" : "bg-red-500"
                         }`}
                       />
-                      <span className="text-[10px] text-muted-foreground">Camera</span>
+                      <span className="text-[11px] font-medium text-muted-foreground">Camera Active</span>
                     </div>
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-2">
                       <div
-                        className={`h-2 w-2 rounded-full ${
-                          speech.isListening ? "bg-green-500 animate-pulse" : "bg-muted"
+                        className={`h-2.5 w-2.5 rounded-full ${
+                          speech.isListening ? "bg-emerald-500 animate-pulse" : "bg-muted-foreground/40"
                         }`}
                       />
-                      <span className="text-[10px] text-muted-foreground">Mic</span>
+                      <span className="text-[11px] font-medium text-muted-foreground">
+                        {speech.isListening ? "Voice Active" : "Mic Idle"}
+                      </span>
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
-              {/* Security */}
-              <Card>
+              {/* Security & Proctoring Metrics */}
+              <Card className="border border-[#22396F]/30 shadow-md">
                 <CardContent className="p-4">
-                  <h3 className="text-sm font-semibold flex items-center gap-2 mb-3">
-                    <Shield className="h-4 w-4 text-primary" /> Security
-                  </h3>
-                  <div className="space-y-2">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-sm font-bold flex items-center gap-1.5">
+                      <Shield className="h-4 w-4 text-primary" /> Anti-Cheating System
+                    </h3>
+                    {penaltyPoints > 0 ? (
+                      <span className="px-2 py-0.5 rounded-full bg-red-500/15 text-red-600 dark:text-red-400 text-[11px] font-extrabold border border-red-500/30">
+                        -{penaltyPoints} Penalty Marks
+                      </span>
+                    ) : (
+                      <span className="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 text-[11px] font-bold">
+                        Clean Record
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="space-y-2.5">
                     <div className="flex justify-between text-xs">
-                      <span className="text-muted-foreground">Score</span>
+                      <span className="text-muted-foreground font-medium">Security Integrity</span>
                       <span
-                        className={
-                          violationLogger.totalScore >= 70
-                            ? "text-green-500"
+                        className={`font-bold ${
+                          violationLogger.totalScore >= 75
+                            ? "text-emerald-500"
+                            : violationLogger.totalScore >= 50
+                            ? "text-amber-500"
                             : "text-red-500"
-                        }
+                        }`}
                       >
                         {violationLogger.totalScore}%
                       </span>
                     </div>
-                    <Progress value={violationLogger.totalScore} className="h-1.5" />
-                    <div className="grid grid-cols-2 gap-2 text-xs mt-2">
+                    <Progress value={violationLogger.totalScore} className="h-2" />
+
+                    <div className="grid grid-cols-2 gap-2 text-xs pt-1">
                       <div className="flex items-center gap-1.5 text-muted-foreground">
                         <div
                           className={`h-2 w-2 rounded-full ${
-                            fullscreen.isFullScreen ? "bg-green-500" : "bg-red-500"
+                            fullscreen.isFullScreen ? "bg-emerald-500" : "bg-red-500"
                           }`}
                         />
-                        Fullscreen
+                        <span>Fullscreen</span>
                       </div>
                       <div className="flex items-center gap-1.5 text-muted-foreground">
                         <div
                           className={`h-2 w-2 rounded-full ${
-                            tabSwitch.isTabVisible ? "bg-green-500" : "bg-red-500"
+                            tabSwitch.isTabVisible ? "bg-emerald-500" : "bg-red-500 animate-ping"
                           }`}
                         />
-                        Tab Focus
+                        <span>Tab Lock</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 text-muted-foreground">
+                        <div
+                          className={`h-2 w-2 rounded-full ${
+                            faceDetection.lastResult.gazeStatus === "focused" ? "bg-emerald-500" : "bg-amber-500"
+                          }`}
+                        />
+                        <span>Camera Gaze</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 text-muted-foreground">
+                        <div className="h-2 w-2 rounded-full bg-emerald-500" />
+                        <span>Voice Only 🎙️</span>
                       </div>
                     </div>
                   </div>
@@ -1607,13 +1855,24 @@ export default function InterviewPage() {
         </div>
       )}
 
-      {/* Violation Modal */}
+      {/* Violation Modal with Sound & Marks Deduction Notice */}
       <ViolationWarningModal
         isOpen={warningModal.open}
         type={warningModal.type}
         warningCount={store.warningCount}
         maxWarnings={MAX_WARNINGS}
-        onDismiss={() => setWarningModal({ open: false, type: "" })}
+        penaltyMarks={warningModal.penalty}
+        isFirstWarning={warningModal.isFirstWarning}
+        nextPenaltyMarks={warningModal.nextPenaltyMarks}
+        onDismiss={() =>
+          setWarningModal({
+            open: false,
+            type: "",
+            penalty: 5,
+            isFirstWarning: false,
+            nextPenaltyMarks: 5,
+          })
+        }
       />
     </div>
   );

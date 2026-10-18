@@ -20,11 +20,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const questions = await generateInterviewQuestions(
-      parsed.data.jobDescription,
-      parsed.data.count,
-      parsed.data.interviewType
-    );
+    const questions = await generateInterviewQuestions({
+      jobDescription: parsed.data.jobDescription,
+      candidateResume: body.candidateResume || body.cvText,
+      count: parsed.data.count,
+      type: parsed.data.interviewType,
+    });
 
     return NextResponse.json({ success: true, data: questions });
   } catch (error) {

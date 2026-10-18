@@ -16,6 +16,7 @@ const notificationSchema = new Schema<INotification>(
         "interview_scheduled",
         "interview_reminder",
         "interview_completed",
+        "final_interview_selected",
         "offer_received",
       ],
       required: true,

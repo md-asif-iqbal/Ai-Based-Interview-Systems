@@ -26,25 +26,37 @@ export async function POST(
 
     const answers = interview.answers || [];
 
-    // ═══ BATCH EVALUATE ALL ANSWERS AT ONCE ═══
-    // Run all AI evaluations in parallel using Promise.all for speed
-    const evaluationPromises = answers.map(async (answer: IInterviewAnswer, idx: number) => {
-      const question = interview.questions[answer.questionIndex ?? idx];
-      if (!question || !answer.answerText) return null;
-      try {
-        const evaluation = await evaluateAnswer(
-          question.questionText,
-          answer.answerText,
-          question.expectedKeywords || []
-        );
-        return { index: idx, evaluation };
-      } catch (err) {
-        console.error(`Evaluation failed for Q${idx + 1}:`, err);
-        return null;
-      }
-    });
+    // ═══ CONTROLLED BATCH EVALUATION TO PREVENT 503/429 SPIKES ═══
+    const evaluationResults: Array<{ index: number; evaluation: typeof answers[0]["evaluation"] } | null> = [];
+    const BATCH_SIZE = 2;
 
-    const evaluationResults = await Promise.all(evaluationPromises);
+    for (let i = 0; i < answers.length; i += BATCH_SIZE) {
+      const slice = answers.slice(i, i + BATCH_SIZE);
+      const batchPromises = slice.map(async (answer: IInterviewAnswer, sliceIdx: number) => {
+        const actualIdx = i + sliceIdx;
+        const question = interview.questions[answer.questionIndex ?? actualIdx];
+        if (!question || !answer.answerText) return null;
+        try {
+          const evaluation = await evaluateAnswer(
+            question.questionText,
+            answer.answerText,
+            question.expectedKeywords || []
+          );
+          return { index: actualIdx, evaluation };
+        } catch (err) {
+          console.error(`Evaluation failed for Q${actualIdx + 1}:`, err);
+          return null;
+        }
+      });
+
+      const batchResults = await Promise.all(batchPromises);
+      evaluationResults.push(...batchResults);
+
+      // Brief delay between batches to respect Gemini concurrency quotas
+      if (i + BATCH_SIZE < answers.length) {
+        await new Promise((resolve) => setTimeout(resolve, 200));
+      }
+    }
 
     // Apply evaluations back to answers
     for (const result of evaluationResults) {
@@ -54,18 +66,25 @@ export async function POST(
       }
     }
 
-    // Calculate overall scores
-    const totalScore =
+    // Calculate raw answer scores
+    const rawTotalScore =
       answers.length > 0
         ? Math.round(answers.reduce((sum: number, a: { score?: number }) => sum + (a.score || 0), 0) / answers.length)
         : 0;
 
+    // Apply strict marks deduction for tab switches & security violations
+    const body = await req.json().catch(() => ({}));
+    const securityLoss = Math.max(0, 100 - (interview.securityScore ?? 100));
+    const clientPenalty = Number(body?.penaltyPoints || 0);
+    const violationPenalty = Math.min(60, Math.max(securityLoss, clientPenalty));
+    const totalScore = Math.max(0, rawTotalScore - violationPenalty);
+
     // Calculate detailed scores
     const detailedScores = {
-      technical: calculateCategoryScore(answers),
+      technical: Math.max(0, calculateCategoryScore(answers) - Math.round(violationPenalty * 0.4)),
       communication: calculateCommunicationScore(answers),
-      problemSolving: calculateCategoryScore(answers),
-      confidence: Math.round(totalScore * 0.9),
+      problemSolving: Math.max(0, calculateCategoryScore(answers) - Math.round(violationPenalty * 0.4)),
+      confidence: Math.max(0, Math.round(totalScore * 0.9)),
     };
 
     // AI recommendation

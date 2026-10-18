@@ -1,87 +1,176 @@
 import { GoogleGenerativeAI, GenerativeModel } from "@google/generative-ai";
 
-const DEPRECATED_MODELS = new Set([
+export const DEFAULT_GEMINI_MODEL = "gemini-2.5-flash";
+
+// Ordered priority chain for fallback models
+export const FALLBACK_MODELS = [
   "gemini-2.5-flash",
-  "gemini-1.5-flash",
-  "gemini-1.5-pro",
   "gemini-2.0-flash",
-  "gemini-2.0-flash-exp",
-]);
+  "gemini-1.5-flash",
+  "gemini-2.5-flash-lite",
+  "gemini-1.5-pro",
+  "gemini-3.8-flash",
+];
 
-export const DEFAULT_GEMINI_MODEL = "gemini-3.8-flash";
-
-export function getResolvedModelName(): string {
+/**
+ * Returns the chain of models to try in order.
+ * If process.env.GEMINI_MODEL is set, it takes precedence as the primary model.
+ */
+export function getModelChain(): string[] {
   const envModel = process.env.GEMINI_MODEL?.trim();
-  if (!envModel || DEPRECATED_MODELS.has(envModel)) {
-    return DEFAULT_GEMINI_MODEL;
+  if (envModel) {
+    return [envModel, ...FALLBACK_MODELS.filter((m) => m !== envModel)];
   }
-  return envModel;
+  return [...FALLBACK_MODELS];
+}
+
+/**
+ * Returns the currently preferred primary model name
+ */
+export function getResolvedModelName(): string {
+  const chain = getModelChain();
+  return chain[0] || DEFAULT_GEMINI_MODEL;
 }
 
 let genAIInstance: GoogleGenerativeAI | null = null;
+let cachedApiKey: string | null = null;
 
-function getGenAI(): GoogleGenerativeAI {
-  const apiKey = process.env.GEMINI_API_KEY;
+export function getGenAI(): GoogleGenerativeAI {
+  const apiKey = process.env.GEMINI_API_KEY?.trim();
   if (!apiKey) {
     throw new Error("GEMINI_API_KEY is not defined in environment variables");
   }
-  if (!genAIInstance) {
+  if (!genAIInstance || cachedApiKey !== apiKey) {
     genAIInstance = new GoogleGenerativeAI(apiKey);
+    cachedApiKey = apiKey;
   }
   return genAIInstance;
 }
 
-export function getGeminiModel(): GenerativeModel {
+export function getGeminiModel(modelName?: string, options: {
+  temperature?: number;
+  topP?: number;
+  topK?: number;
+  maxOutputTokens?: number;
+} = {}): GenerativeModel {
   const genAI = getGenAI();
+  const selectedModel = modelName || getResolvedModelName();
   return genAI.getGenerativeModel({
-    model: getResolvedModelName(),
+    model: selectedModel,
     generationConfig: {
-      temperature: 0.7,
-      topP: 0.8,
-      topK: 40,
-      maxOutputTokens: 8192,
+      temperature: options.temperature ?? 0.7,
+      topP: options.topP ?? 0.8,
+      topK: options.topK ?? 40,
+      maxOutputTokens: options.maxOutputTokens ?? 8192,
     },
   });
 }
 
-export async function generateContent(prompt: string): Promise<string> {
-  const model = getGeminiModel();
+export interface ModelExecutionOptions {
+  temperature?: number;
+  topP?: number;
+  topK?: number;
+  maxOutputTokens?: number;
+}
 
-  try {
-    const result = await retryWithBackoff(async () => {
-      const response = await model.generateContent(prompt);
-      return response.response.text();
+/**
+ * Executes a Gemini operation across the fallback model chain.
+ * If a model returns 503 (high demand), 429 (rate limit), 404 (not found), or 5xx,
+ * it automatically moves to the next model in the fallback chain.
+ */
+export async function executeWithModelFallback<T>(
+  operation: (model: GenerativeModel, modelName: string) => Promise<T>,
+  options: ModelExecutionOptions = {}
+): Promise<{ result: T; usedModel: string }> {
+  const models = getModelChain();
+  let lastError: Error | null = null;
+  const attemptsLog: string[] = [];
+
+  const genAI = getGenAI();
+
+  for (let mIdx = 0; mIdx < models.length; mIdx++) {
+    const modelName = models[mIdx];
+    const model = genAI.getGenerativeModel({
+      model: modelName,
+      generationConfig: {
+        temperature: options.temperature ?? 0.7,
+        topP: options.topP ?? 0.8,
+        topK: options.topK ?? 40,
+        maxOutputTokens: options.maxOutputTokens ?? 8192,
+      },
     });
-    return result;
-  } catch (error) {
-    console.error("Gemini API error:", error);
-    throw new Error(error instanceof Error ? error.message : "Failed to generate content from Gemini API");
+
+    // Try each model with up to 2 attempts for momentary hiccups
+    const maxTriesForModel = 2;
+    for (let attempt = 0; attempt < maxTriesForModel; attempt++) {
+      try {
+        const result = await operation(model, modelName);
+        if (mIdx > 0 || attempt > 0) {
+          console.log(`[Gemini Fallback] Succeeded using fallback model "${modelName}" (attempt ${attempt + 1})`);
+        }
+        return { result, usedModel: modelName };
+      } catch (err: unknown) {
+        const error = err as Error;
+        lastError = error;
+        const msg = error.message || String(error);
+
+        const is503HighDemand = msg.includes("503") || msg.toLowerCase().includes("high demand") || msg.toLowerCase().includes("service unavailable");
+        const is429RateLimit = msg.includes("429") || msg.toLowerCase().includes("quota") || msg.includes("RESOURCE_EXHAUSTED");
+        const is404NotFound = msg.includes("404") || msg.toLowerCase().includes("not found");
+        const isLeakedOrPermission = msg.includes("403") || msg.includes("PERMISSION_DENIED") || msg.toLowerCase().includes("leaked");
+
+        if (isLeakedOrPermission) {
+          attemptsLog.push(`${modelName}: API key permission denied/leaked (403)`);
+          // Stop chain if key is completely blocked
+          throw new Error(`Gemini API key is invalid or flagged as leaked (403 Permission Denied). Please update GEMINI_API_KEY in .env.local.`);
+        }
+
+        if (is404NotFound) {
+          attemptsLog.push(`${modelName}: Model not found (404)`);
+          // Model does not exist, break to next model immediately
+          break;
+        }
+
+        if (attempt < maxTriesForModel - 1) {
+          const delay = is503HighDemand || is429RateLimit ? 1000 : 400;
+          await new Promise((r) => setTimeout(r, delay));
+        } else {
+          attemptsLog.push(`${modelName}: ${msg.slice(0, 100)}`);
+          if (mIdx < models.length - 1) {
+            console.warn(`[Gemini Fallback] Model "${modelName}" failed (${msg.slice(0, 120)}). Trying fallback model "${models[mIdx + 1]}"...`);
+          }
+        }
+      }
+    }
   }
+
+  throw new Error(
+    `All Gemini fallback models exhausted [${models.join(", ")}]. Errors: ${attemptsLog.join(" | ")} | Last error: ${lastError?.message || "Unknown error"}`
+  );
+}
+
+export async function generateContent(prompt: string): Promise<string> {
+  const { result } = await executeWithModelFallback(async (model) => {
+    const response = await model.generateContent(prompt);
+    return response.response.text();
+  }, { temperature: 0.7 });
+
+  return result;
 }
 
 // Generate with custom temperature — used for question generation (higher creativity)
 export async function generateContentCreative(prompt: string, temperature = 1.2): Promise<string> {
-  const genAI = getGenAI();
-  const model = genAI.getGenerativeModel({
-    model: getResolvedModelName(),
-    generationConfig: {
-      temperature,   // higher = more varied questions per interview
-      topP: 0.95,
-      topK: 64,
-      maxOutputTokens: 8192,
-    },
+  const { result } = await executeWithModelFallback(async (model) => {
+    const response = await model.generateContent(prompt);
+    return response.response.text();
+  }, {
+    temperature,
+    topP: 0.95,
+    topK: 64,
+    maxOutputTokens: 8192,
   });
 
-  try {
-    const result = await retryWithBackoff(async () => {
-      const response = await model.generateContent(prompt);
-      return response.response.text();
-    });
-    return result;
-  } catch (error) {
-    console.error("Gemini creative API error:", error);
-    throw new Error(error instanceof Error ? error.message : "Failed to generate content from Gemini API");
-  }
+  return result;
 }
 
 export async function generateJSON<T>(prompt: string): Promise<T> {
@@ -104,27 +193,4 @@ export function extractJSON(text: string): string {
     return jsonMatch[0].trim();
   }
   return text.trim();
-}
-
-// Retry with exponential backoff
-async function retryWithBackoff<T>(
-  fn: () => Promise<T>,
-  maxRetries: number = 3,
-  baseDelay: number = 1000
-): Promise<T> {
-  let lastError: Error | null = null;
-
-  for (let attempt = 0; attempt <= maxRetries; attempt++) {
-    try {
-      return await fn();
-    } catch (error) {
-      lastError = error as Error;
-      if (attempt < maxRetries) {
-        const delay = baseDelay * Math.pow(2, attempt);
-        await new Promise((resolve) => setTimeout(resolve, delay));
-      }
-    }
-  }
-
-  throw lastError;
 }

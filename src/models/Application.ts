@@ -21,6 +21,7 @@ const applicationSchema = new Schema<IApplication>(
         "interview_scheduled",
         "interviewed",
         "under_review",
+        "final_interview",
         "offer",
         "rejected",
         "withdrawn",

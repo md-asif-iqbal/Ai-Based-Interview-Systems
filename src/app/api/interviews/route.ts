@@ -86,7 +86,9 @@ export async function POST(req: NextRequest) {
     await connectDB();
 
     // Get application and job details
-    const application = await Application.findById(parsed.data.applicationId).populate("jobId");
+    const application = await Application.findById(parsed.data.applicationId)
+      .populate("jobId")
+      .populate("candidateId");
     if (!application) {
       return NextResponse.json({ success: false, error: "Application not found" }, { status: 404 });
     }
@@ -96,12 +98,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, error: "Job not found" }, { status: 404 });
     }
 
-    // Generate questions with AI
-    const questions = await generateInterviewQuestions(
-      `${job.title}\n${job.description}\nSkills: ${job.requirements?.skills?.join(", ")}`,
-      10,
-      parsed.data.interviewType
-    );
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const cand = application.candidateId as any;
+
+    // Generate questions with AI dynamically tailored to Job + Candidate CV
+    const questions = await generateInterviewQuestions({
+      jobTitle: job.title,
+      jobDescription: `${job.title}\n${job.description}\nSkills: ${job.requirements?.skills?.join(", ")}`,
+      requiredSkills: job.requirements?.skills || [],
+      candidateResume: cand?.parsedResume,
+      count: 10,
+      type: parsed.data.interviewType,
+    });
 
     const interview = await Interview.create({
       applicationId: parsed.data.applicationId,

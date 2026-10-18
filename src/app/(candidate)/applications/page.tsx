@@ -21,6 +21,7 @@ import {
   Building2,
   MapPin,
   CalendarDays,
+  Sparkles,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -51,6 +52,15 @@ interface Application {
   resumeMatchScore?: number;
   coverLetter?: string;
   createdAt: string;
+  applicationData?: {
+    selectedForFinalRound?: boolean;
+    finalInterview?: {
+      scheduledAt?: string;
+      meetingLink?: string;
+      notes?: string;
+      selectedAt?: string;
+    };
+  };
 }
 
 const statusConfig: Record<string, { label: string; color: string; bg: string; icon: React.ReactNode }> = {
@@ -59,6 +69,7 @@ const statusConfig: Record<string, { label: string; color: string; bg: string; i
   interview_scheduled: { label: "Interview Scheduled", color: "text-[#010736]", bg: "bg-[#FCF1D0] font-semibold", icon: <Video className="h-3.5 w-3.5" /> },
   interviewed: { label: "Interviewed", color: "text-[#FCF1D0]", bg: "bg-[#22396F]", icon: <CheckCircle2 className="h-3.5 w-3.5" /> },
   under_review: { label: "Under Review", color: "text-white", bg: "bg-[#0D1C42] border border-[#22396F]", icon: <FileText className="h-3.5 w-3.5" /> },
+  final_interview: { label: "Final Round 🎯", color: "text-[#010736]", bg: "bg-emerald-400 font-extrabold shadow-sm", icon: <Sparkles className="h-3.5 w-3.5 text-[#010736]" /> },
   offer: { label: "Offer Received", color: "text-[#010736]", bg: "bg-[#FCF1D0] font-bold", icon: <Star className="h-3.5 w-3.5" /> },
   rejected: { label: "Rejected", color: "text-white", bg: "bg-[#010736] border border-[#22396F]", icon: <XCircle className="h-3.5 w-3.5" /> },
   withdrawn: { label: "Withdrawn", color: "text-[#cbd5e1]", bg: "bg-[#010736]", icon: <XCircle className="h-3.5 w-3.5" /> },
@@ -193,6 +204,7 @@ export default function MyApplicationsPage() {
               <SelectItem value="interview_scheduled">Interview Scheduled</SelectItem>
               <SelectItem value="interviewed">Interviewed</SelectItem>
               <SelectItem value="under_review">Under Review</SelectItem>
+              <SelectItem value="final_interview">Final Round</SelectItem>
               <SelectItem value="offer">Offer</SelectItem>
               <SelectItem value="rejected">Rejected</SelectItem>
             </SelectContent>
@@ -288,6 +300,43 @@ export default function MyApplicationsPage() {
                                 <span className="font-semibold text-[#010736] dark:text-[#FCF1D0]">{app.resumeMatchScore}%</span>
                               </div>
                               <Progress value={app.resumeMatchScore} className="h-1.5" />
+                            </div>
+                          )}
+
+                          {/* Final Interview Invitation Notice */}
+                          {(app.status === "final_interview" || app.applicationData?.selectedForFinalRound) && (
+                            <div className="mt-3.5 p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-900 dark:text-emerald-200">
+                              <div className="flex items-center justify-between mb-1">
+                                <span className="font-bold text-xs flex items-center gap-1.5 text-emerald-700 dark:text-emerald-300">
+                                  <Sparkles className="h-4 w-4 text-emerald-500" />
+                                  🎉 Selected for Final Interview Round!
+                                </span>
+                                <Badge className="bg-emerald-600 text-white text-[10px] px-2 py-0.5 border-0 font-bold">
+                                  Invited
+                                </Badge>
+                              </div>
+                              {app.applicationData?.finalInterview?.notes && (
+                                <p className="text-xs text-muted-foreground dark:text-emerald-200/80 mt-1 italic">
+                                  &ldquo;{app.applicationData.finalInterview.notes}&rdquo;
+                                </p>
+                              )}
+                              {app.applicationData?.finalInterview?.scheduledAt && (
+                                <p className="text-xs font-semibold mt-1.5 text-emerald-800 dark:text-emerald-300">
+                                  📅 Scheduled: {new Date(app.applicationData.finalInterview.scheduledAt).toLocaleString()}
+                                </p>
+                              )}
+                              {app.applicationData?.finalInterview?.meetingLink && (
+                                <div className="mt-2.5">
+                                  <a
+                                    href={app.applicationData.finalInterview.meetingLink}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-sm transition-all"
+                                  >
+                                    <Video className="h-3.5 w-3.5" /> Join Live Final Interview
+                                  </a>
+                                </div>
+                              )}
                             </div>
                           )}
                         </div>

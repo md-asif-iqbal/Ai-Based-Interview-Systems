@@ -157,6 +157,7 @@ export type ApplicationStatus =
   | "interview_scheduled"
   | "interviewed"
   | "under_review"
+  | "final_interview"
   | "offer"
   | "rejected"
   | "withdrawn";
@@ -316,6 +317,7 @@ export type NotificationType =
   | "interview_scheduled"
   | "interview_reminder"
   | "interview_completed"
+  | "final_interview_selected"
   | "offer_received";
 
 export interface INotification {

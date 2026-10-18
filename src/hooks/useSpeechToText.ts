@@ -36,15 +36,20 @@ declare global {
   }
 }
 
-export function useSpeechToText() {
+export type SpeechLanguage = "en-US" | "bn-BD";
+
+export function useSpeechToText(initialLanguage: SpeechLanguage = "en-US") {
   const recognitionRef = useRef<ISpeechRecognition | null>(null);
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState("");
   const [interimTranscript, setInterimTranscript] = useState("");
   const [isSupported, setIsSupported] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [language, setLanguageState] = useState<SpeechLanguage>(initialLanguage);
+  
   const isListeningRef = useRef(false);
   const restartingRef = useRef(false);
+  const languageRef = useRef<SpeechLanguage>(initialLanguage);
 
   useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -54,7 +59,7 @@ export function useSpeechToText() {
       const recognition = new SpeechRecognition();
       recognition.continuous = true;
       recognition.interimResults = true;
-      recognition.lang = "en-US";
+      recognition.lang = languageRef.current;
       recognition.maxAlternatives = 3;
 
       recognition.onresult = (event: SpeechRecognitionEvent) => {
@@ -97,6 +102,7 @@ export function useSpeechToText() {
           setTimeout(() => {
             if (isListeningRef.current && recognitionRef.current) {
               try {
+                recognitionRef.current.lang = languageRef.current;
                 recognitionRef.current.start();
               } catch {
                 // Already started or other error — ignore
@@ -114,6 +120,31 @@ export function useSpeechToText() {
     }
   }, []);
 
+  const setLanguage = useCallback((newLang: SpeechLanguage) => {
+    languageRef.current = newLang;
+    setLanguageState(newLang);
+    if (recognitionRef.current) {
+      recognitionRef.current.lang = newLang;
+      if (isListeningRef.current) {
+        try {
+          recognitionRef.current.stop();
+        } catch {
+          // ignore
+        }
+        setTimeout(() => {
+          if (isListeningRef.current && recognitionRef.current) {
+            try {
+              recognitionRef.current.lang = newLang;
+              recognitionRef.current.start();
+            } catch {
+              // ignore
+            }
+          }
+        }, 200);
+      }
+    }
+  }, []);
+
   const startListening = useCallback(() => {
     if (!recognitionRef.current) return;
     // Stop any existing session first
@@ -128,6 +159,8 @@ export function useSpeechToText() {
     setError(null);
     isListeningRef.current = true;
     setIsListening(true);
+    // Ensure current language is applied
+    recognitionRef.current.lang = languageRef.current;
     // Delay to flush any audio buffer from AI speaker output
     setTimeout(() => {
       if (isListeningRef.current && recognitionRef.current) {
@@ -161,6 +194,8 @@ export function useSpeechToText() {
     interimTranscript,
     isSupported,
     error,
+    language,
+    setLanguage,
     startListening,
     stopListening,
     resetTranscript,

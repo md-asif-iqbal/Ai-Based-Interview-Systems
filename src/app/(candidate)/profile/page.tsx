@@ -15,6 +15,10 @@ import {
   ArrowLeft,
   CheckCircle2,
   Briefcase,
+  Video,
+  Sparkles,
+  ExternalLink,
+  Calendar,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -33,9 +37,19 @@ interface UserProfile {
   profilePicture?: string;
 }
 
+interface FinalInterviewItem {
+  _id: string;
+  jobTitle: string;
+  companyName: string;
+  scheduledAt?: string;
+  meetingLink?: string;
+  notes?: string;
+}
+
 export default function ProfilePage() {
   const router = useRouter();
   const [user, setUser] = useState<UserProfile | null>(null);
+  const [finalInterviews, setFinalInterviews] = useState<FinalInterviewItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [editing, setEditing] = useState(false);
@@ -43,15 +57,36 @@ export default function ProfilePage() {
 
   const fetchProfile = useCallback(async () => {
     try {
-      const res = await fetch("/api/auth/me");
-      if (!res.ok) {
+      const [authRes, appsRes] = await Promise.all([
+        fetch("/api/auth/me"),
+        fetch("/api/applications/my"),
+      ]);
+      if (!authRes.ok) {
         router.push("/login");
         return;
       }
-      const data = await res.json();
+      const data = await authRes.json();
       const u = data.user;
       setUser(u);
       setForm({ fullName: u.fullName || "", phone: u.phone || "" });
+
+      if (appsRes.ok) {
+        const appsData = await appsRes.json();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const list = (appsData.data || appsData.applications || [])
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .filter((a: any) => a.status === "final_interview" || Boolean(a.applicationData?.selectedForFinalRound))
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .map((a: any) => ({
+            _id: a._id,
+            jobTitle: a.jobId?.title || "Role",
+            companyName: a.jobId?.companyId?.name || "Company",
+            scheduledAt: a.applicationData?.finalInterview?.scheduledAt,
+            meetingLink: a.applicationData?.finalInterview?.meetingLink,
+            notes: a.applicationData?.finalInterview?.notes,
+          }));
+        setFinalInterviews(list);
+      }
     } catch {
       toast.error("Failed to load profile");
     } finally {
@@ -171,6 +206,82 @@ export default function ProfilePage() {
             </CardContent>
           </Card>
         </motion.div>
+
+        {/* Final Round Interview Invitations Card */}
+        {finalInterviews.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+            className="mb-6"
+          >
+            <Card className="overflow-hidden border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 via-white dark:via-[#0D1C42] to-teal-500/10 dark:to-[#0D1C42] shadow-md">
+              <CardHeader className="pb-3 border-b border-emerald-500/20">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-base flex items-center gap-2 text-emerald-700 dark:text-emerald-300 font-bold">
+                    <Sparkles className="h-5 w-5 text-emerald-500" />
+                    Final Round Interview Invitations
+                  </CardTitle>
+                  <Badge className="bg-emerald-600 text-white font-bold text-xs border-0">
+                    {finalInterviews.length} Shortlisted
+                  </Badge>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-4 space-y-4">
+                {finalInterviews.map((item) => (
+                  <div
+                    key={item._id}
+                    className="p-4 rounded-2xl bg-white/70 dark:bg-[#010736]/70 border border-emerald-500/20 shadow-sm space-y-2.5"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <h4 className="text-base font-bold text-[#010736] dark:text-white">
+                          {item.jobTitle}
+                        </h4>
+                        <p className="text-xs text-[#64748b] dark:text-[#cbd5e1]">
+                          {item.companyName}
+                        </p>
+                      </div>
+                      <Badge className="bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 font-bold text-[10px] shrink-0">
+                        🎉 Final Round
+                      </Badge>
+                    </div>
+
+                    {item.notes && (
+                      <p className="text-xs text-muted-foreground dark:text-[#cbd5e1] italic bg-[#f8fafc] dark:bg-[#0D1C42] p-2.5 rounded-xl border border-border/40">
+                        &ldquo;{item.notes}&rdquo;
+                      </p>
+                    )}
+
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
+                      {item.scheduledAt ? (
+                        <div className="flex items-center gap-1.5 text-xs font-semibold text-emerald-700 dark:text-emerald-300">
+                          <Calendar className="h-3.5 w-3.5" />
+                          <span>{new Date(item.scheduledAt).toLocaleString()}</span>
+                        </div>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">Schedule to be announced</span>
+                      )}
+
+                      <div className="flex items-center gap-2">
+                        {item.meetingLink ? (
+                          <a
+                            href={item.meetingLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-sm transition-all"
+                          >
+                            <Video className="h-3.5 w-3.5" /> Join Live Meeting
+                          </a>
+                        ) : null}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
 
         {/* Profile Details / Edit Form */}
         <motion.div
